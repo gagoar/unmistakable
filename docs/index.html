@@ -66,7 +66,7 @@ footer{padding:36px 0 60px;color:var(--mute);font-size:14px;border-top:1px solid
 
 <section id="how">
 <h2>How it works</h2>
-<p class="sub">Three steps. The linter is a prebuilt binary. Nothing to install but the plugin.</p>
+<p class="sub">Three steps. The linter is TypeScript that Node runs as it is. Nothing to install but the plugin, and Node 22.18 or later.</p>
 <ol class="steps">
 <li><strong>Ask in plain words.</strong> &ldquo;Rewrite this tool description so an agent cannot misread it.&rdquo; The skill picks strict mode for procedures and error messages, and a lighter mode for READMEs and PR descriptions.</li>
 <li><strong>It rewrites without losing a fact.</strong> Each flagged sentence is fixed one rule at a time. A condition, a number or a scope qualifier is never dropped to make a sentence shorter.</li>
@@ -76,8 +76,8 @@ footer{padding:36px 0 60px;color:var(--mute);font-size:14px;border-top:1px solid
 
 <section id="linter">
 <h2>A linter you can run anywhere</h2>
-<p class="sub">Standard library Go, one binary per platform, exit code 1 when hard findings pass the baseline. Good for CI.</p>
-<pre>$ echo "We spin up the box; it isn't running." | ste-lint
+<p class="sub">No dependency and no binary: about 60 KB of readable TypeScript. Exit code 1 when hard findings pass the baseline. Good for CI.</p>
+<pre>$ echo "We spin up the box; it isn't running." | node scripts/ste-lint.ts
 &lt;stdin&gt;:1:4 phrasal-verb (STE-9.3): Soft phrasal verb. Use the single plain verb ... [spin up]
 &lt;stdin&gt;:1:19 semicolon (STE-8.1): STE bans the semicolon (Rule 8.1). Split into separate sentences. [;]
 &lt;stdin&gt;:1:24 contraction (STE-4.2): Contraction. Write the full words ... [isn't]</pre>
@@ -99,11 +99,11 @@ footer{padding:36px 0 60px;color:var(--mute);font-size:14px;border-top:1px solid
 
 <section id="credit">
 <h2>Credit, and what this is not</h2>
-<p>The skill and the first linter are by Dustin Yuchen Teng: <a href="https://github.com/danyuchn/asd-ste100-skill">danyuchn/asd-ste100-skill</a>, MIT. unmistakable packages them, fixes the statements that an audit against Issue 9 found wrong, ports the linter to Go, and adds profiles and checks. <a href="https://github.com/gagoar/unmistakable/blob/main/UPSTREAM.md">UPSTREAM.md</a> lists every change.</p>
+<p>The skill and the first linter are by Dustin Yuchen Teng: <a href="https://github.com/danyuchn/asd-ste100-skill">danyuchn/asd-ste100-skill</a>, MIT. unmistakable packages them, fixes the statements that an audit against Issue 9 found wrong, ports the linter to TypeScript, and adds profiles and checks. <a href="https://github.com/gagoar/unmistakable/blob/main/UPSTREAM.md">UPSTREAM.md</a> lists every change.</p>
 <p class="note">ASD-STE100 is a copyright and a trademark of ASD, Brussels. This project is not made, checked or endorsed by ASD, and it does not claim that a text complies with the standard. It ships no part of the dictionary and none of the text of the rules. Get the standard, free, from <a href="https://www.asd-ste100.org/">asd-ste100.org</a>.</p>
 </section>
 
-<footer><span>MIT license &middot; unmistakable v0.1.0</span><a href="https://github.com/gagoar/unmistakable">GitHub</a><a href="https://github.com/gagoar/gago-plugins">gago-plugins</a><a href="https://github.com/gagoar/unmistakable/blob/main/THIRD_PARTY_NOTICES.md">Credits</a></footer>
+<footer><span>MIT license &middot; unmistakable v0.2.0</span><a href="https://github.com/gagoar/unmistakable">GitHub</a><a href="https://github.com/gagoar/gago-plugins">gago-plugins</a><a href="https://github.com/gagoar/unmistakable/blob/main/THIRD_PARTY_NOTICES.md">Credits</a></footer>
 </main>
 </body>
 </html>

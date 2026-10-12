@@ -2,7 +2,7 @@
 
 ## asd-ste100 skill and its linter
 
-`skills/asd-ste100/` and `internal/stelint/` come from
+`skills/asd-ste100/` and `scripts/` (a port of its linter) come from
 [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill) at commit
 `32511c6992ecb5f1971e46a2943f2e6adceedafe`. Copyright (c) 2026 Dustin Yuchen Teng. MIT license. The full
 text is in `LICENSE-UPSTREAM`. The skill text is changed in this repository: see `UPSTREAM.md`.

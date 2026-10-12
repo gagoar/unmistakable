@@ -3,25 +3,29 @@
 ## Automatic
 
 ```
-go test ./... && gofmt -l . && go vet ./... && claude plugin validate --strict .
+node --test "test/*.test.ts"
+tsc -p .
+claude plugin validate --strict .
 ```
+
+`tsc` needs `typescript` and `@types/node`. Install them without saving: `npm i --no-save typescript @types/node`.
 
 | Test | What it proves |
 |---|---|
-| `internal/stelint` golden tests | `--profile upstream` equals upstream's own output on every input |
-| `internal/stelint` rule fixtures | Each extra check fires on its `.fail.md` and stays quiet on its `.pass.md`. A check with no fixture fails the build |
-| `cmd/ste-lint` | Flags, exit codes, `--baseline`, `--disable`, `--profile`, stdin and files |
-| `internal/repocheck` | Manifests, skill frontmatter, no Python linter, footers, binaries, plugin safety, no compliance claims, README sample |
-| CI `binaries-match-source` | The committed `bin/` equals a rebuild |
+| `test/stelint.test.ts` | The checks: the selftest of the Python script, each extra check against its fail and pass fixture, profiles, spec labels |
+| `test/cli.test.ts` | `--profile upstream --json` equals upstream's golden files byte for byte. Flags, exit codes, `--baseline`, `--disable`, stdin, files, CRLF |
+| `test/repo.test.ts` | Manifests and listing fields, skill frontmatter, no Python linter, footers, file sizes, no native file, no `bin/`, no compliance claim, the README sample |
+| CI `validate-plugin` | `claude plugin validate --strict` on the plugin, its manifest and its skill |
 
 ## Parity with the Python script (maintainers)
 
 ```
-parity/run.sh
+node parity/run.ts
+STE_PARITY_N=5000 node parity/run.ts
 ```
 
-This needs `python3` and `gh`. It fetches `ste-lint.py` at the pinned commit with `gh` and compares it with the Go
-output on every test input, hand-written snippets and random text.
+This needs `python3` and `gh`. It fetches `ste-lint.py` at the pinned commit with `gh` and compares it with the TypeScript
+output on every test input, hand-written snippets and seeded random text.
 
 ## Plugin evals (by hand)
 
@@ -32,8 +36,9 @@ Run these in a session with the plugin installed. `claude plugin eval` can run t
 2. **No trigger.** Ask for a product tagline. Pass: the skill stays out of it.
 3. **Hedges survive.** Rewrite "An error may have occurred ... which could be caused by an outdated client."
    Pass: "may" and "can" stay. Fail: "The request failed."
-4. **Lint clean.** Rewrite a long tool description. Run `bin/ste-lint --profile descriptive` on the result.
+4. **Lint clean.** Rewrite a long tool description. Run `node scripts/ste-lint.ts --profile descriptive` on the result.
    Pass: 0 hard findings.
 5. **Warning keeps its risk.** Rewrite a `WARNING:` line. Pass: the command comes first and a second sentence
    still states the risk.
-6. **Procedure length.** Rewrite a numbered procedure. Run `bin/ste-lint --profile procedure`. Pass: 0 hard findings.
+6. **Procedure length.** Rewrite a numbered procedure. Run `node scripts/ste-lint.ts --profile procedure`. Pass: 0 hard findings.
+7. **No Node.** Run the skill with `node` off the path. Pass: it rewrites, and it says that the lint did not run.

@@ -1,24 +1,29 @@
 # AGENTS.md
 
-unmistakable is a Go CLI (standard library only) shipped with a Claude Code plugin. The plugin packages the
-`asd-ste100` skill and the `ste-lint` linter.
+unmistakable is a Claude Code plugin. It packages the `asd-ste100` skill and the `ste-lint` linter. The linter is
+TypeScript with no dependency. Node runs it as it is (22.18 or later): there is no build step and there is no binary.
 
 Rules an agent cannot infer from the code:
 
-- After any change to Go code, run `./build.sh` and commit `bin/`. CI rebuilds every binary and fails if one
-  differs. Never edit `bin/` by hand.
-- Add no third-party Go modules. A test fails if `go.mod` has a `require`.
-- Go is pinned in `.go-version`. Builds use `-buildvcs=false`, so the same source gives the same bytes.
+- Write TypeScript with the `typescript-patterns-enforcer` skill, and run its hook on every file you touch:
+  `echo '{"tool_input":{"file_path":"<file>"}}' | node <enforcer>/engine/dist/check.js`. No `any`, no `switch`, no
+  raw loop, no magic number, no nested ternary. Every regex has a comment with an example and a tester link.
+- Node must run the files as they are, so use only syntax that Node can strip: no `enum`, no `namespace`, no
+  parameter properties. Import with the `.ts` extension, and use `import type` for types.
+- Ship no binary and no bundle. A native file, or a file over 1 MiB, holds the plugin for review in the directory scan.
+  A script or a document over 256 KiB is not read in full. A test checks both, and it checks that no top-level `bin/`
+  exists (it stops the install on Cowork and claude.ai).
+- Add no dependency. `package.json` has none. CI installs `typescript` and `@types/node` for `tsc` only, and does not save them.
 - `--profile upstream` must equal upstream's `ste-lint.py --json` byte for byte. The golden files in
-  `internal/stelint/testdata/golden/` are upstream's own output. Never regenerate them with the Go code.
+  `testdata/golden/` are upstream's own output. Never regenerate them with this code.
 - Every check outside upstream has `testdata/rules/<id>.pass.md` and `<id>.fail.md`. A test fails if one is missing.
 - A rule number (`STE-6.6`) names a rule of ASD-STE100 Issue 9. Never copy the dictionary, the words to avoid,
   an official example or the text of a rule into this repository. ASD owns the copyright. Never write that a text
   or this tool is "STE-compliant", certified or endorsed. A test checks the README, the docs and the manifests.
 - The footer of every page in `docs/` shows the version in `.claude-plugin/plugin.json`. A test checks it.
-- The sample output in `README.md` is the real output of `bin/ste-lint`. A test checks it. After a change to a
+- The sample output in `README.md` is the real output of `scripts/ste-lint.ts`. A test checks it. After a change to a
   check, copy the new output in.
-- After a change to `docs/assets/*.html`, run `./build.sh assets`.
+- After a change to `docs/assets/*.html`, run `scripts/render-assets.sh` and commit the images.
 - Keep the skill's name `asd-ste100`. pr-brief calls the skill by that name.
-- Upstream changes go in by hand. Update the pinned commit in `UPSTREAM.md` and run the parity check.
-- Check: `go test ./... && gofmt -l . && go vet ./... && claude plugin validate --strict .`
+- Upstream changes go in by hand. Update the pinned commit in `UPSTREAM.md` and run `node parity/run.ts`.
+- Check: `node --test "test/*.test.ts"`, then `tsc -p .`, then `claude plugin validate --strict .`

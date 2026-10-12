@@ -13,9 +13,9 @@ Upstream is MIT licensed, © 2026 Dustin Yuchen Teng. The full text is in `LICEN
 ## What comes from upstream
 
 - `skills/asd-ste100/SKILL.md`, `references/writing-rules.md`, `examples/*.md`: the skill text.
-- `internal/stelint/`: a Go port of `scripts/ste-lint.py`. It began as a copy of `internal/stelint` in
-  [gagoar/pr-brief](https://github.com/gagoar/pr-brief). Its `UPSTREAM.md` lists the deviations from the Python
-  script. The test inputs and the golden files in `internal/stelint/testdata/` are upstream's own.
+- `scripts/`: a TypeScript port of `scripts/ste-lint.py`. Under `--profile upstream` it gives the same output as the
+  Python script, byte for byte: `node parity/run.ts` proves it on the test inputs, on hand-written snippets and on
+  random text. The test inputs and the golden files in `testdata/` are upstream's own.
 
 ## What this repository changes
 
@@ -30,9 +30,9 @@ Upstream is MIT licensed, © 2026 Dustin Yuchen Teng. The full text is in `LICEN
    is labeled `X-`.
 6. Part 1 of `examples/before-after.md` is titled "Rule Illustrations", not "Official STE Examples": the
    examples are not ASD's.
-7. `scripts/ste-lint.py` is not shipped. The skill runs `bin/ste-lint`.
+7. `scripts/ste-lint.py` is not shipped. The skill runs `node scripts/ste-lint.ts`.
 
-**The linter.** `--profile upstream` gives upstream's output, byte for byte. The other profiles
+**The linter.** It is TypeScript that Node runs as it is, so no binary ships. `--profile upstream` gives upstream's output, byte for byte. The other profiles
 (`agent`, the default, `descriptive`, `procedure`) label each finding with its rule number in a `spec` field and
 add checks: paragraph length, contractions, `-ing` forms, multi-word nouns, WARNING and CAUTION blocks,
 dropped articles, British spellings, and the 20-word limit of procedures. The word lists are this project's own.

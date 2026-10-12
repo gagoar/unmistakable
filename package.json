@@ -1,0 +1,11 @@
+{
+  "name": "unmistakable",
+  "private": true,
+  "description": "Rewrite English so an AI agent cannot misread it. The linter runs as TypeScript, with no build step.",
+  "type": "module",
+  "engines": { "node": ">=22.18" },
+  "scripts": {
+    "test": "node --test \"test/*.test.ts\"",
+    "typecheck": "tsc -p ."
+  }
+}
