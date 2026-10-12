@@ -20,7 +20,7 @@ go test ./... && gofmt -l . && go vet ./... && claude plugin validate --strict .
 parity/run.sh
 ```
 
-This needs `python3` and `gh`. It downloads `ste-lint.py` at the pinned commit and compares it with the Go
+This needs `python3` and `gh`. It fetches `ste-lint.py` at the pinned commit with `gh` and compares it with the Go
 output on every test input, hand-written snippets and random text.
 
 ## Plugin evals (by hand)

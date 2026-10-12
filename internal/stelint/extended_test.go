@@ -45,9 +45,9 @@ func TestEveryExtraRuleHasFixtures(t *testing.T) {
 					t.Errorf("%s has spec %q, want %q", id, v.Spec, extraSpec[id])
 				}
 			}
-			pass := LintNamed(read("pass"), id+".pass.md", opts)
-			if n := countRule(pass, id); n != 0 {
-				t.Errorf("the pass fixture fires %s %d times: %+v", id, n, pass.Violations)
+			quiet := LintNamed(read("pass"), id+".pass.md", opts)
+			if n := countRule(quiet, id); n != 0 {
+				t.Errorf("the pass fixture fires %s %d times: %+v", id, n, quiet.Violations)
 			}
 		})
 	}
@@ -121,7 +121,7 @@ func TestProcedureProfileUsesTheTwentyWordLimit(t *testing.T) {
 }
 
 func TestCodeAndHeadingsAreNotProse(t *testing.T) {
-	text := "# Hydraulic pump pressure switch housing\n\n```\nx = isn't; colour\n```\n\nUse `colour` and https://example.com/colour here.\n"
+	text := "# Hydraulic pump pressure switch housing\n\n```\nx = isn't; colour\n```\n\nUse `colour` and https://host.invalid/colour here.\n"
 	for _, v := range Lint(text, Options{Profile: ProfileAgent}).Violations {
 		t.Errorf("code, headings and URLs must be skipped: %+v", v)
 	}

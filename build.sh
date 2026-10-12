@@ -3,7 +3,7 @@
 # Needs Go once, on the maintainer or CI machine. Users need nothing installed.
 # The Go version is pinned in .go-version so a rebuild reproduces the committed bytes.
 #
-# ./build.sh assets   redraw docs/assets/*.png from docs/assets/*.html (needs Chrome)
+# ./build.sh assets   render the page images from docs/assets/*.html (needs Chrome)
 set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,14 +19,16 @@ case "${1:-}" in
       if [ -x "$c" ] || command -v "$c" >/dev/null 2>&1; then chrome="$c"; fi
     done
     [ -n "$chrome" ] || { echo "build.sh: set CHROME to a Chrome or Chromium binary" >&2; exit 1; }
-    shot() { # html width height out
+    # shot PAGE WIDTH HEIGHT DIR: renders docs/assets/PAGE to DIR, named like the page with a .png extension.
+    shot() {
+      local out="$4/${1%.html}.png"
       "$chrome" --headless --hide-scrollbars --force-device-scale-factor=1 --window-size="$2,$3" \
-        --screenshot="$here/docs/assets/$4" "file://$here/docs/assets/$1" >/dev/null 2>&1
-      echo "wrote docs/assets/$4"
+        --screenshot="$out" "file://$here/docs/assets/$1" >/dev/null 2>&1
+      echo "wrote ${out#"$here"/}"
     }
-    shot icon.html 1024 1024 icon.png
-    shot og.html 1200 630 og.png
-    cp "$here/docs/assets/icon.png" "$here/.claude-plugin/icon.png"
+    shot icon.html 1024 1024 "$here/docs/assets"
+    shot og.html 1200 630 "$here/docs/assets"
+    shot icon.html 1024 1024 "$here/.claude-plugin"
     exit 0
     ;;
 esac

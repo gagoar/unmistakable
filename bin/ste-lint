@@ -1,11 +1,6 @@
 #!/bin/sh
 # ste-lint: picks and runs the prebuilt binary for this machine.
-# Set STE_LINT_BIN to run a different binary (for development).
 set -eu
-
-if [ -n "${STE_LINT_BIN:-}" ]; then
-  exec "$STE_LINT_BIN" "$@"
-fi
 
 here="$(cd "$(dirname "$0")" && pwd)"
 ext=""
