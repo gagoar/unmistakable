@@ -1,0 +1,2 @@
+Remove panel.
+Close cover.

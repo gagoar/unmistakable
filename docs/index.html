@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>unmistakable: English an AI agent cannot misread</title>
+<meta name="description" content="A Claude Code plugin that rewrites English so an AI agent cannot misread it, with a linter that checks the result. Follows the ASD-STE100 rules.">
+<meta property="og:title" content="unmistakable">
+<meta property="og:description" content="Rewrite English so an AI agent cannot misread it. With a linter that checks.">
+<meta property="og:image" content="https://gagoar.github.io/unmistakable/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/icon.png">
+<style>
+:root{--bg:#0b1220;--panel:#111a2e;--line:#22304d;--text:#e6edf7;--mute:#9fb0cc;--green:#4ade80;--amber:#fbbf24;--red:#f87171}
+@media (prefers-color-scheme:light){:root{--bg:#f7f9fc;--panel:#fff;--line:#d7deea;--text:#0b1220;--mute:#4b5a75;--green:#15803d;--amber:#b45309;--red:#b91c1c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+a{color:var(--green)}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+main{max-width:980px;margin:0 auto;padding:0 24px}
+.hero{padding:88px 0 40px;text-align:center}
+.hero img{width:96px;height:96px;border-radius:22px}
+h1{font-size:clamp(40px,7vw,68px);letter-spacing:-2px;margin:18px 0 12px;line-height:1.05}
+.lead{font-size:21px;color:var(--mute);max-width:660px;margin:0 auto 28px}
+.cmd{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 22px;text-align:left}
+.cmd span{color:var(--mute)}
+section{padding:44px 0;border-top:1px solid var(--line)}
+h2{font-size:30px;letter-spacing:-.5px;margin:0 0 8px}
+.sub{color:var(--mute);margin:0 0 22px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h3{margin:0 0 8px;font-size:15px;text-transform:uppercase;letter-spacing:.08em}
+.before h3{color:var(--red)}.after h3{color:var(--green)}
+.card p{margin:0}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+tr:last-child td{border-bottom:0}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;overflow:auto;margin:0}
+.note{border-left:4px solid var(--amber);background:var(--panel);padding:14px 18px;border-radius:0 10px 10px 0;margin-top:18px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:14px}
+.steps li{counter-increment:s;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px 16px 62px;position:relative}
+.steps li:before{content:counter(s);position:absolute;left:18px;top:14px;width:30px;height:30px;border-radius:50%;background:var(--green);color:var(--bg);font-weight:700;text-align:center;line-height:30px}
+footer{padding:36px 0 60px;color:var(--mute);font-size:14px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 22px}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+<img src="assets/icon.png" alt="">
+<h1>unmistakable</h1>
+<p class="lead">Rewrite English so an AI agent cannot misread it. A skill that rewrites, and a linter that checks.</p>
+<div class="cmd"><span>/plugin marketplace add</span> gagoar/gago-plugins<br><span>/plugin install</span> unmistakable@gago-plugins</div>
+</header>
+
+<section id="why">
+<h2>An agent cannot ask what you meant</h2>
+<p class="sub">A tool description, an error message or a system prompt has one reader and no author to call. Every word with two meanings, and every sentence with two parses, is a coin toss. The ASD-STE100 rules were built to remove both, so a maintenance technician could not misread an instruction. An agent is in the same position.</p>
+<div class="grid">
+<div class="card before"><h3>Before</h3><p>An error may have occurred while processing your request due to a possible mismatch in the expected data format, which could be caused by an outdated client version.</p></div>
+<div class="card after"><h3>After</h3><p>Your request may have failed. The cause may be a data format that does not match what the server expects. An outdated client can cause this mismatch. Check your client version.</p></div>
+</div>
+<p class="note">The rewrite keeps the hedges. &ldquo;May have failed&rdquo; stays &ldquo;may have failed&rdquo;. Confidence is content, and a rewrite that sounds surer than its author is wrong.</p>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<p class="sub">Three steps. The linter is a prebuilt binary. Nothing to install but the plugin.</p>
+<ol class="steps">
+<li><strong>Ask in plain words.</strong> &ldquo;Rewrite this tool description so an agent cannot misread it.&rdquo; The skill picks strict mode for procedures and error messages, and a lighter mode for READMEs and PR descriptions.</li>
+<li><strong>It rewrites without losing a fact.</strong> Each flagged sentence is fixed one rule at a time. A condition, a number or a scope qualifier is never dropped to make a sentence shorter.</li>
+<li><strong>The linter checks.</strong> <code>ste-lint</code> runs on the result and names each remaining problem with the number of the rule behind it.</li>
+</ol>
+</section>
+
+<section id="linter">
+<h2>A linter you can run anywhere</h2>
+<p class="sub">Standard library Go, one binary per platform, exit code 1 when hard findings pass the baseline. Good for CI.</p>
+<pre>$ echo "We spin up the box; it isn't running." | ste-lint
+&lt;stdin&gt;:1:4 phrasal-verb (STE-9.3): Soft phrasal verb. Use the single plain verb ... [spin up]
+&lt;stdin&gt;:1:19 semicolon (STE-8.1): STE bans the semicolon (Rule 8.1). Split into separate sentences. [;]
+&lt;stdin&gt;:1:24 contraction (STE-4.2): Contraction. Write the full words ... [isn't]</pre>
+<p></p>
+<table>
+<tr><th>Profile</th><th>Use it for</th></tr>
+<tr><td><code>agent</code> (default)</td><td>Text that an agent reads. Every check.</td></tr>
+<tr><td><code>descriptive</code></td><td>Explanations. The checks that follow a numbered STE rule, 25 words per sentence.</td></tr>
+<tr><td><code>procedure</code></td><td>Steps and instructions. 20 words per sentence.</td></tr>
+<tr><td><code>upstream</code></td><td>The original <code>ste-lint.py</code> output, byte for byte.</td></tr>
+</table>
+</section>
+
+<section id="checks">
+<h2>What it checks</h2>
+<p class="sub">Structure, not meaning. It has no part-of-speech tagger, and it never flags a hedge.</p>
+<p>Semicolons, phrasal verbs, nominalizations, passive voice, compound tenses, one term per action, sentence length, paragraph length, contractions, <code>-ing</code> forms, multi-word nouns, WARNING and CAUTION blocks, dropped articles, British spellings, marketing adjectives and dangling conjunctions in lists. Each finding carries its rule number (<code>STE-6.6</code>). A check that is not an STE rule has the prefix <code>X-</code>.</p>
+</section>
+
+<section id="credit">
+<h2>Credit, and what this is not</h2>
+<p>The skill and the first linter are by Dustin Yuchen Teng: <a href="https://github.com/danyuchn/asd-ste100-skill">danyuchn/asd-ste100-skill</a>, MIT. unmistakable packages them, fixes the statements that an audit against Issue 9 found wrong, ports the linter to Go, and adds profiles and checks. <a href="https://github.com/gagoar/unmistakable/blob/main/UPSTREAM.md">UPSTREAM.md</a> lists every change.</p>
+<p class="note">ASD-STE100 is a copyright and a trademark of ASD, Brussels. This project is not made, checked or endorsed by ASD, and it does not claim that a text complies with the standard. It ships no part of the dictionary and none of the text of the rules. Get the standard, free, from <a href="https://www.asd-ste100.org/">asd-ste100.org</a>.</p>
+</section>
+
+<footer><span>MIT license &middot; unmistakable v0.1.0</span><a href="https://github.com/gagoar/unmistakable">GitHub</a><a href="https://github.com/gagoar/gago-plugins">gago-plugins</a><a href="https://github.com/gagoar/unmistakable/blob/main/THIRD_PARTY_NOTICES.md">Credits</a></footer>
+</main>
+</body>
+</html>

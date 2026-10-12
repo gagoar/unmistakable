@@ -1,0 +1,38 @@
+# Once a week, compare upstream's HEAD with the commit pinned in UPSTREAM.md. If upstream has moved,
+# open an issue that lists the new commits. This job never fails a pull request, and it never changes a file.
+name: upstream-watch
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Compare with upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          upstream=danyuchn/asd-ste100-skill
+          pinned="$(grep -oE '[0-9a-f]{40}' UPSTREAM.md | head -1)"
+          [ -n "$pinned" ] || { echo "no pinned commit in UPSTREAM.md" >&2; exit 1; }
+          branch="$(gh api "repos/$upstream" --jq .default_branch)"
+          head="$(gh api "repos/$upstream/commits/$branch" --jq .sha)"
+          echo "pinned $pinned, upstream $head"
+          if [ "$head" = "$pinned" ]; then exit 0; fi
+          title="Upstream asd-ste100-skill has new commits"
+          if [ -n "$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')" ]; then
+            echo "an issue is already open"; exit 0
+          fi
+          log="$(gh api "repos/$upstream/compare/$pinned...$head" --jq '.commits[] | "- " + .sha[0:7] + " " + (.commit.message | split("\n")[0])' | head -30)"
+          gh issue create --title "$title" --body "Pinned: \`$pinned\`. Upstream \`$branch\` is \`$head\`.
+
+          $log
+
+          Port what matters by hand, run \`STE_PARITY=1 go test ./internal/stelint -run TestParity\`, and update the pinned commit in UPSTREAM.md."

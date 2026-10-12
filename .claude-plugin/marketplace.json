@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "unmistakable",
+  "description": "Rewrite English so an AI agent cannot misread it, with a deterministic linter.",
+  "owner": { "name": "gagoar", "url": "https://github.com/gagoar" },
+  "plugins": [
+    {
+      "name": "unmistakable",
+      "description": "Rewrite English so an AI agent cannot misread it: tool descriptions, error messages, PR descriptions and agent instructions. Follows the ASD-STE100 rules and ships a deterministic linter.",
+      "author": { "name": "gagoar", "url": "https://github.com/gagoar" },
+      "homepage": "https://gagoar.github.io/unmistakable/",
+      "license": "MIT",
+      "keywords": ["writing", "technical-writing", "plain-english", "ste", "linter", "agents"],
+      "category": "productivity",
+      "source": "./"
+    }
+  ]
+}
