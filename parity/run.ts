@@ -12,7 +12,7 @@ import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { run } from "../scripts/ste-lint.ts";
+import { run } from "../scripts/cli.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 process.chdir(root);

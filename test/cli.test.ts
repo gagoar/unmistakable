@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, readdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -84,5 +85,17 @@ test("usage errors exit 2 with a message", () => {
   });
   const version = cli(["version"]);
   assert.equal(version.code, EXIT.ok);
-  assert.ok(version.out.split(".").every((part) => part && !Number.isNaN(Number(part))), version.out);
+  // The version that the script prints is the version of the plugin, so a release cannot change one and not the other.
+  const manifest: { readonly version: string } = JSON.parse(readFileSync(".claude-plugin/plugin.json", "utf8"));
+  assert.equal(version.out, manifest.version);
+});
+
+// The entry point must not depend on how the path to it is spelled. On macOS /tmp is a symlink, and a plugin cache can sit under
+// one: an entry guard that compared the real path with argv made the script print nothing there.
+test("the entry point runs through a symlinked path", () => {
+  const link = join(mkdtempSync(join(tmpdir(), "ste-link-")), "scripts");
+  symlinkSync(join(ROOT, "scripts"), link);
+  const result = spawnSync("node", [join(link, "ste-lint.ts")], { input: "Close; open.\n", encoding: "utf8" });
+  assert.equal(result.status, EXIT.findings, result.stderr);
+  assert.ok(result.stdout.includes("semicolon"), `stdout: ${result.stdout} stderr: ${result.stderr}`);
 });

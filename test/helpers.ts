@@ -1,6 +1,6 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { run } from "../scripts/ste-lint.ts";
+import { run } from "../scripts/cli.ts";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
