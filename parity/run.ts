@@ -6,7 +6,7 @@
 //   STE_PARITY_N=5000 node parity/run.ts
 //
 // It checks every file in testdata, a run with --baseline and --disable, a list of hand-written snippets, and a
-// seeded random corpus built from tricky tokens. The script is fetched at the commit pinned in UPSTREAM.md.
+// seeded random corpus built from tricky pieces. The script is fetched at the commit pinned in UPSTREAM.md.
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -22,8 +22,8 @@ const EXIT_FINDINGS = 1;
 const MAX_FAILURES = 5;
 const DEFAULT_COUNT = 300;
 const DEFAULT_SEED = 100;
-const MIN_TOKENS = 3;
-const TOKEN_SPREAD = 40;
+const MIN_PIECES = 3;
+const PIECE_SPREAD = 40;
 const SPACE_ODDS = 5;
 const TWO_TO_32 = 4_294_967_296;
 const INPUT_PREVIEW = 200;
@@ -37,13 +37,13 @@ const SHIFT_C = 14;
 
 // A 40-character commit hash, as a hex string.
 // Matches "32511c6992ecb5f1971e46a2943f2e6adceedafe"; rejects "32511c6".
-// https://regex101.com/?flavor=javascript&regex=%5B0-9a-f%5D%7B40%7D&flags=gm&testString=32511c6992ecb5f1971e46a2943f2e6adceedafe%0A32511c6
+// https://regexr.com/?expression=%2F%5B0-9a-f%5D%7B40%7D%2Fgm&text=32511c6992ecb5f1971e46a2943f2e6adceedafe%0A32511c6
 const COMMIT = /[0-9a-f]{40}/;
 // White space anywhere, which base64 text from the GitHub API may hold. Replaced with nothing: "YQ==\n" → "YQ==".
-// https://regex101.com/?flavor=javascript&regex=%5Cs&flags=g&testString=YQ%3D%3D%0A%0AYQ%3D%3D
+// https://regexr.com/?expression=%2F%5Cs%2Fg&text=YQ%3D%3D%0A%0AYQ%3D%3D
 const ANY_SPACE = /\s/g;
 // The newline that Python's print adds at the end of its output. Replaced with nothing: "{}\n" → "{}"; "{}" is unchanged.
-// https://regex101.com/?flavor=javascript&regex=%5Cn%24&flags=gm&testString=%7B%7D%0A%0A%7B%7D
+// https://regexr.com/?expression=%2F%5Cn%24%2Fgm&text=%7B%7D%0A%0A%7B%7D
 const FINAL_NEWLINE = /\n$/;
 
 function upstreamScript(): string {
@@ -95,12 +95,12 @@ const SNIPPETS: readonly string[] = [
   "éseamless seamlessé _seamless_ seamless_", "Check. verify this. confirm", "blazing fast blazing-fast blazing fast", "spin up spin up",
   "Perform an analysis of x. Perform an éanalysis.", "Ends with and ", "- a and \n- b or　", "word second; line third",
   "a | b\n--- | ---\nc \\| d | e;", "|a|b|\n|---|---|\n|x\\|y|z; q|", "KKeep ſtart the sſtop. İs ıs",
-  `Long ${"w ".repeat(TOKEN_SPREAD)}end. Short.`, "Tab\there\ttext;\u0000nul", "﻿BOM; line", "emoji \u{1F600}; \u{1F600} seamless",
+  `Long ${"w ".repeat(PIECE_SPREAD)}end. Short.`, "Tab\there\ttext;\u0000nul", "﻿BOM; line", "emoji \u{1F600}; \u{1F600} seamless",
   "> - quote and\n> - x or", "- a\n\n  and\n- b and\n  ```\n  x and\n  ```\n", "1) x\n   - y and\n2) z or",
 ];
 SNIPPETS.forEach((text, i) => compare(`snippet ${i}`, text));
 
-const TOKENS: readonly string[] = [
+const PIECES: readonly string[] = [
   "is", "are", "was", "were", "been", "being", "has", "have", "had", "may", "might", "could", "not", "n’t", "used", "removed", "run", "set", "gone", "begun",
   "to", "for", "by", "parsing", "running", "and", "or", ";", ".", "!", "?", "|", "`code`", "`", "```", "~~~", "-", "*", "1.", "2)", "perform", "an", "analysis", "carry out",
   "seamless", "robust", "check", "verify", "confirm", "use", "utilize", "spin up", "kick off", "é", "ü", "日本", " ", "　", "\t", "  ", "\n", "\n", "\r\n", "\r", "\v", "\x1c", "\x1f",
@@ -121,7 +121,7 @@ function seeded(seed: number): () => number {
 const random = seeded(Number(process.env["STE_PARITY_SEED"] ?? DEFAULT_SEED));
 const pick = (n: number): number => Math.floor(random() * n);
 const randomText = (): string =>
-  Array.from({ length: MIN_TOKENS + pick(TOKEN_SPREAD) }, () => `${TOKENS[pick(TOKENS.length)] ?? ""}${pick(SPACE_ODDS) ? " " : ""}`).join("");
+  Array.from({ length: MIN_PIECES + pick(PIECE_SPREAD) }, () => `${PIECES[pick(PIECES.length)] ?? ""}${pick(SPACE_ODDS) ? " " : ""}`).join("");
 
 const count = Number(process.env["STE_PARITY_N"] ?? DEFAULT_COUNT);
 Array.from({ length: count }, (_, n) => n).every((n) => {

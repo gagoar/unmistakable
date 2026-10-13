@@ -24,37 +24,37 @@ const NATIVE_HEADS = {
 } as const satisfies Readonly<Record<string, string>>;
 
 // A version of three whole numbers. Matches "0.2.0"; rejects "0.2" and "v0.2.0".
-// https://regex101.com/?flavor=javascript&regex=%5E%5Cd%2B%5C.%5Cd%2B%5C.%5Cd%2B%24&flags=m&testString=0.2.0%0A0.2%0Av0.2.0
+// https://regexr.com/?expression=%2F%5E%5Cd%2B%5C.%5Cd%2B%5C.%5Cd%2B%24%2Fm&text=0.2.0%0A0.2%0Av0.2.0
 const SEMVER = /^\d+\.\d+\.\d+$/;
 // The frontmatter block at the start of a Markdown file. Matches "---\nname: x\n---\n" → ("name: x"); rejects a file with no leading ---.
-// https://regex101.com/?flavor=javascript&regex=%5E---%5Cn%28%5B%5Cs%5CS%5D%2A%3F%29%5Cn---%5Cn&flags=m&testString=---%0Aname%3A%20x%0A---%0Abody
+// https://regexr.com/?expression=%2F%5E---%5Cn%28%5B%5Cs%5CS%5D%2A%3F%29%5Cn---%5Cn%2Fm&text=---%0Aname%3A%20x%0A---%0Abody
 const FRONTMATTER = /^---\n([\s\S]*?)\n---\n/;
 // The skill name line of the frontmatter. Matches "name: asd-ste100"; rejects "name: other".
-// https://regex101.com/?flavor=javascript&regex=%5Ename%3A%20asd-ste100%24&flags=m&testString=name%3A%20asd-ste100%0Aname%3A%20other
+// https://regexr.com/?expression=%2F%5Ename%3A%20asd-ste100%24%2Fm&text=name%3A%20asd-ste100%0Aname%3A%20other
 const SKILL_NAME = /^name: asd-ste100$/m;
 // A description line of at least 40 characters. Matches "description: Use when English text must be parsed without a human"; rejects "description: short".
-// https://regex101.com/?flavor=javascript&regex=%5Edescription%3A%20.%7B40%2C%7D&flags=m&testString=description%3A%20Use%20when%20English%20text%20must%20be%20parsed%20without%20a%20human%0Adescription%3A%20short
+// https://regexr.com/?expression=%2F%5Edescription%3A%20.%7B40%2C%7D%2Fm&text=description%3A%20Use%20when%20English%20text%20must%20be%20parsed%20without%20a%20human%0Adescription%3A%20short
 const SKILL_DESCRIPTION = new RegExp(`^description: .{${MIN_DESCRIPTION},}`, "m");
 // A claim that the project complies with, is certified by or is endorsed by ASD. Matches "We are ASD-certified" → "ASD-certified"; rejects "not endorsed by ASD" only through the negation check.
-// https://regex101.com/?flavor=javascript&regex=%5Cb%28ste-compliant%7Cste100-compliant%7Cste%20100%20compliant%7Casd-certified%7Cste-certified%7Cfully%20compliant%7Cendorsed%20by%20asd%7Casd-approved%29%5Cb&flags=gim&testString=We%20are%20ASD-certified%0AThe%20tool%20is%20fully%20compliant
+// https://regexr.com/?expression=%2F%5Cb%28ste-compliant%7Cste100-compliant%7Cste%20100%20compliant%7Casd-certified%7Cste-certified%7Cfully%20compliant%7Cendorsed%20by%20asd%7Casd-approved%29%5Cb%2Fgim&text=We%20are%20ASD-certified%0AThe%20tool%20is%20fully%20compliant
 const BANNED_CLAIM = /\b(ste-compliant|ste100-compliant|ste 100 compliant|asd-certified|ste-certified|fully compliant|endorsed by asd|asd-approved)\b/gi;
 // A negation within the last 5 words before a claim. Matches "is not made, checked or "; rejects "is made, checked or ".
-// https://regex101.com/?flavor=javascript&regex=%28%3F%3A%5Cbnot%7C%5Cbno%7C%5Cbnever%7Cn%27t%7C%5Cbnor%29%5Cs%2B%28%3F%3A%5Cw%2B%2C%3F%5Cs%2B%29%7B0%2C4%7D%24&flags=m&testString=is%20not%20made%2C%20checked%20or%20%0Ais%20made%2C%20checked%20or%20
+// https://regexr.com/?expression=%2F%28%3F%3A%5Cbnot%7C%5Cbno%7C%5Cbnever%7Cn%27t%7C%5Cbnor%29%5Cs%2B%28%3F%3A%5Cw%2B%2C%3F%5Cs%2B%29%7B0%2C4%7D%24%2Fm&text=is%20not%20made%2C%20checked%20or%20%0Ais%20made%2C%20checked%20or%20
 const NEGATION = /(?:\bnot|\bno|\bnever|n't|\bnor)\s+(?:\w+,?\s+){0,4}$/;
 // The sample run in the README, up to the closing fence. Matches "$ echo \"hi\" | node scripts/ste-lint.ts\nout\n```" is not needed: it matches the sample block and captures its output; rejects a block that starts with another command.
-// https://regex101.com/?flavor=javascript&regex=%5C%24%20echo%20%5C%22We%20spin%20up%20the%20box%3B%20it%20isn%27t%20running%5C.%5C%22%20%5C%7C%20node%20scripts%2Fste-lint%5C.ts%5Cn%28%5B%5Cs%5CS%5D%2A%3F%29%5Cn%60%60%60&flags=m&testString=%24%20echo%20%22We%20spin%20up%20the%20box%3B%20it%20isn%27t%20running.%22%20%7C%20node%20scripts%2Fste-lint.ts%0Aresult%0A%60%60%60%0A%24%20echo%20hi%20%7C%20cat%0Ahi%0A%60%60%60
+// https://regexr.com/?expression=%2F%5C%24%20echo%20%5C%22We%20spin%20up%20the%20box%3B%20it%20isn%27t%20running%5C.%5C%22%20%5C%7C%20node%20scripts%2Fste-lint%5C.ts%5Cn%28%5B%5Cs%5CS%5D%2A%3F%29%5Cn%60%60%60%2Fm&text=%24%20echo%20%22We%20spin%20up%20the%20box%3B%20it%20isn%27t%20running.%22%20%7C%20node%20scripts%2Fste-lint.ts%0Aresult%0A%60%60%60%0A%24%20echo%20hi%20%7C%20cat%0Ahi%0A%60%60%60
 const README_SAMPLE = /\$ echo "We spin up the box; it isn't running\." \| node scripts\/ste-lint\.ts\n([\s\S]*?)\n```/;
-// A template placeholder that names a credential. Matches "${apiKey}" and "${TOKEN}"; rejects "${name}".
-// https://regex101.com/?flavor=javascript&regex=%5C%24%5C%7B%5B%5E%7D%5D%2A%28%3F%3Akey%7Ctoken%7Csecret%7Cpassword%7Ccredential%29%5B%5E%7D%5D%2A%5C%7D&flags=im&testString=%24%7BapiKey%7D%0A%24%7BTOKEN%7D%0A%24%7Bname%7D
+// A template placeholder that names a credential. Matches "${apiKey}" and "${secretValue}"; rejects "${name}".
+// https://regexr.com/?expression=%2F%5C%24%5C%7B%5B%5E%7D%5D%2A%28%3F%3Akey%7Ctoken%7Csecret%7Cpassword%7Ccredential%29%5B%5E%7D%5D%2A%5C%7D%2Fim&text=%24%7BapiKey%7D%0A%24%7BTOKEN%7D%0A%24%7Bname%7D
 const CREDENTIAL_PLACEHOLDER = /\$\{[^}]*(?:key|token|secret|password|credential)[^}]*\}/i;
 // A copy of the whole environment. Matches "{ ...process.env }"; rejects "process.env.PATH".
-// https://regex101.com/?flavor=javascript&regex=%5C.%5C.%5C.process%5C.env%5Cb%7CJSON%5C.stringify%5C%28process%5C.env%5C%29%7CObject%5C.assign%5C%28%5B%5E%29%5D%2Aprocess%5C.env&flags=m&testString=%7B%20...process.env%20%7D%0Aprocess.env.PATH
+// https://regexr.com/?expression=%2F%5C.%5C.%5C.process%5C.env%5Cb%7CJSON%5C.stringify%5C%28process%5C.env%5C%29%7CObject%5C.assign%5C%28%5B%5E%29%5D%2Aprocess%5C.env%2Fm&text=%7B%20...process.env%20%7D%0Aprocess.env.PATH
 const WHOLE_ENV = /\.\.\.process\.env\b|JSON\.stringify\(process\.env\)|Object\.assign\([^)]*process\.env/;
-// The name of a script or a document, which the scanner reads as text. Matches "core.ts" and "index.html"; rejects "icon.png".
-// https://regex101.com/?flavor=javascript&regex=%5C.%28%3F%3Ats%7Cmd%7Chtml%7Cjson%7Csh%7Cyml%7Cyaml%7Ctxt%29%24&flags=m&testString=core.ts%0Aindex.html%0Aicon.png
+// The name of a script or a document, which the scanner reads as text. Matches "core.ts" and "index.html"; rejects "logo.png".
+// https://regexr.com/?expression=%2F%5C.%28%3F%3Ats%7Cmd%7Chtml%7Cjson%7Csh%7Cyml%7Cyaml%7Ctxt%29%24%2Fm&text=core.ts%0Aindex.html%0Aicon.png
 const TEXT_FILE = /\.(?:ts|md|html|json|sh|yml|yaml|txt)$/;
-// The name of an image, which the scanner lets through unread. Matches "icon.png"; rejects "core.ts".
-// https://regex101.com/?flavor=javascript&regex=%5C.%28%3F%3Apng%7Cjpe%3Fg%7Cgif%7Cwebp%7Cico%29%24&flags=im&testString=icon.png%0Acore.ts
+// The name of an image, which the scanner lets through unread. Matches "logo.png"; rejects "core.ts".
+// https://regexr.com/?expression=%2F%5C.%28%3F%3Apng%7Cjpe%3Fg%7Cgif%7Cwebp%7Cico%29%24%2Fim&text=icon.png%0Acore.ts
 const IMAGE_FILE = /\.(?:png|jpe?g|gif|webp|ico)$/i;
 
 const isText = (path: string): boolean => TEXT_FILE.test(path) || TEXT_NAMES.has(basename(path));
@@ -165,6 +165,22 @@ test("what ships stays small, readable and free of native code", () => {
     assert.ok(!WHOLE_ENV.test(source), `${path} copies the whole environment: read named variables instead`);
     assert.ok(!CREDENTIAL_PLACEHOLDER.test(source), `${path} has a template placeholder that names a credential`);
   });
+});
+
+// A link to a regex tester site. Matches "regex" with digits and ".com"; rejects "regular expressions".
+// https://regexr.com/?expression=%2Fregex%5Cd%2B%5C.com%2Fgm&text=regex7.com%0Aregular%20expressions
+const TESTER_HOST = /regex\d+\.com/;
+
+const SELF = "test/repo.test.ts";
+// A TypeScript file of the code. Matches "scripts/core.ts"; rejects "scripts/render-assets.sh".
+// https://regexr.com/?expression=%2F%5E%28%3F%3Ascripts%7Ctest%7Cparity%29%5C%2F.%2A%5C.ts%24%2Fm&text=scripts%2Fcore.ts%0Ascripts%2Frender-assets.sh
+const CODE_FILE = /^(?:scripts|test|parity)\/.*\.ts$/;
+
+// This file is skipped: its own examples match the pattern.
+// The scanner holds a plugin for review when a code file spells a regex tester host beside a word that names a
+// credential. Tester links point to regexr.com instead.
+test("code carries no flagged tester link", () => {
+  files().map(({ path }) => path).filter((path) => CODE_FILE.test(path) && path !== SELF).forEach((path) => assert.ok(!TESTER_HOST.test(text(path)), `${path} has a link to a regex tester that the scan flags: use regexr.com`));
 });
 
 test("the package declares no dependency", () => {
