@@ -4,10 +4,10 @@ import { CODE_FENCE, INLINE_CODE } from "./core.ts";
 import { chars, splitLines, strip } from "./pytext.ts";
 
 // A URL that starts with http://, https://, ftp:// or www.. Matches "see https://a.test/x." → "https://a.test/x."; rejects "see a.test".
-// https://regex101.com/?flavor=javascript&regex=%28%3F%3A%5Cb%28%3F%3Ahttps%3F%7Cftp%29%3A%5C%2F%5C%2F%7C%5Cbwww%5C.%29%5B%5E%5Cs%3C%3E%5D%2B&flags=gim&testString=see%20https%3A%2F%2Fa.test%2Fx.%0Asee%20a.test
+// https://regexr.com/?expression=%2F%28%3F%3A%5Cb%28%3F%3Ahttps%3F%7Cftp%29%3A%5C%2F%5C%2F%7C%5Cbwww%5C.%29%5B%5E%5Cs%3C%3E%5D%2B%2Fgim&text=see%20https%3A%2F%2Fa.test%2Fx.%0Asee%20a.test
 const URL = /(?:\b(?:https?|ftp):\/\/|\bwww\.)[^\s<>]+/gi;
 // Punctuation at the end of a URL that is not part of it. Matches the "." in "https://a.test/x."; rejects "https://a.test/x".
-// https://regex101.com/?flavor=javascript&regex=%5B.%2C%3B%3A%21%3F%29%5C%5D%27%5C%22%2A_%5D%2B%24&flags=m&testString=https%3A%2F%2Fa.test%2Fx.%0Ahttps%3A%2F%2Fa.test%2Fx
+// https://regexr.com/?expression=%2F%5B.%2C%3B%3A%21%3F%29%5C%5D%27%5C%22%2A_%5D%2B%24%2Fm&text=https%3A%2F%2Fa.test%2Fx.%0Ahttps%3A%2F%2Fa.test%2Fx
 const URL_TRAIL = /[.,;:!?)\]'\"*_]+$/;
 
 const COMMENT_OPEN = chars("<!--");

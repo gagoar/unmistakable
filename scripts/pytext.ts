@@ -2,25 +2,25 @@
 // Text is handled as arrays of code points, so a column counts characters, as in Python.
 
 // Leading white space, as Python counts it. Matches "  ab" → "  "; rejects "ab".
-// https://regex101.com/?flavor=javascript&regex=%5E%5B%5Ct-%5Cr%5Cx1c-%5Cx1f%20%5Cx85%5Cxa0%5Cu1680%5Cu2000-%5Cu200a%5Cu2028%5Cu2029%5Cu202f%5Cu205f%5Cu3000%5D%2B&flags=m&testString=%20%20ab%0Aab
+// https://regexr.com/?expression=%2F%5E%5B%5Ct-%5Cr%5Cx1c-%5Cx1f%20%5Cx85%5Cxa0%5Cu1680%5Cu2000-%5Cu200a%5Cu2028%5Cu2029%5Cu202f%5Cu205f%5Cu3000%5D%2B%2Fm&text=%20%20ab%0Aab
 const LEADING_SPACE = /^[\t-\r\x1c-\x1f \x85\xa0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+/;
 // Trailing white space, as Python counts it. Matches "ab  " → "  "; rejects "ab".
-// https://regex101.com/?flavor=javascript&regex=%5B%5Ct-%5Cr%5Cx1c-%5Cx1f%20%5Cx85%5Cxa0%5Cu1680%5Cu2000-%5Cu200a%5Cu2028%5Cu2029%5Cu202f%5Cu205f%5Cu3000%5D%2B%24&flags=m&testString=ab%20%20%0Aab
+// https://regexr.com/?expression=%2F%5B%5Ct-%5Cr%5Cx1c-%5Cx1f%20%5Cx85%5Cxa0%5Cu1680%5Cu2000-%5Cu200a%5Cu2028%5Cu2029%5Cu202f%5Cu205f%5Cu3000%5D%2B%24%2Fm&text=ab%20%20%0Aab
 const TRAILING_SPACE = /[\t-\r\x1c-\x1f \x85\xa0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+$/;
 // A run of white space, as Python counts it. Matches the gap in "a  b" → "  "; rejects "ab".
-// https://regex101.com/?flavor=javascript&regex=%5B%5Ct-%5Cr%5Cx1c-%5Cx1f%20%5Cx85%5Cxa0%5Cu1680%5Cu2000-%5Cu200a%5Cu2028%5Cu2029%5Cu202f%5Cu205f%5Cu3000%5D%2B&flags=m&testString=a%20%20b%0Aab
+// https://regexr.com/?expression=%2F%5B%5Ct-%5Cr%5Cx1c-%5Cx1f%20%5Cx85%5Cxa0%5Cu1680%5Cu2000-%5Cu200a%5Cu2028%5Cu2029%5Cu202f%5Cu205f%5Cu3000%5D%2B%2Fm&text=a%20%20b%0Aab
 const SPACE_RUN = /[\t-\r\x1c-\x1f \x85\xa0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+/;
 // One white-space character, as Python counts it. Matches " " and "\u3000"; rejects "a".
-// https://regex101.com/?flavor=javascript&regex=%5E%5B%5Ct-%5Cr%5Cx1c-%5Cx1f%20%5Cx85%5Cxa0%5Cu1680%5Cu2000-%5Cu200a%5Cu2028%5Cu2029%5Cu202f%5Cu205f%5Cu3000%5D%24&flags=m&testString=%20%0A%E3%80%80%0Aa
+// https://regexr.com/?expression=%2F%5E%5B%5Ct-%5Cr%5Cx1c-%5Cx1f%20%5Cx85%5Cxa0%5Cu1680%5Cu2000-%5Cu200a%5Cu2028%5Cu2029%5Cu202f%5Cu205f%5Cu3000%5D%24%2Fm&text=%20%0A%E3%80%80%0Aa
 const SPACE_CHAR = /^[\t-\r\x1c-\x1f \x85\xa0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]$/;
 // One Unicode word character, like Python's \w. Matches "é", "7" and "_"; rejects "-" and "😀".
-// https://regex101.com/?flavor=javascript&regex=%5E%5B%5Cp%7BL%7D%5Cp%7BN%7D_%5D%24&flags=mu&testString=%C3%A9%0A7%0A_%0A-%0A%F0%9F%98%80
+// https://regexr.com/?expression=%2F%5E%5B%5Cp%7BL%7D%5Cp%7BN%7D_%5D%24%2Fmu&text=%C3%A9%0A7%0A_%0A-%0A%F0%9F%98%80
 const WORD_CHAR = /^[\p{L}\p{N}_]$/u;
 // A line break by the rules of Python's str.splitlines. Matches the break in "a⏎b" (a newline between a and b); rejects "ab".
-// https://regex101.com/?flavor=javascript&regex=%5Cr%5Cn%7C%5B%5Cn%5Cv%5Cf%5Cx1c%5Cx1d%5Cx1e%5Cx85%5Cu2028%5Cu2029%5Cr%5D&flags=m&testString=a%0Ab%0Aab
+// https://regexr.com/?expression=%2F%5Cr%5Cn%7C%5B%5Cn%5Cv%5Cf%5Cx1c%5Cx1d%5Cx1e%5Cx85%5Cu2028%5Cu2029%5Cr%5D%2Fm&text=a%0Ab%0Aab
 const LINE_BREAK = /\r\n|[\n\v\f\x1c\x1d\x1e\x85\u2028\u2029\r]/;
 // A character that Python's ensure_ascii writes as an escape. Replaced as "é" → "\u00e9"; "a" is unchanged.
-// https://regex101.com/?flavor=javascript&regex=%5B%5Cu007f-%5Cuffff%5D&flags=gm&testString=%C3%A9%0Aa
+// https://regexr.com/?expression=%2F%5B%5Cu007f-%5Cuffff%5D%2Fgm&text=%C3%A9%0Aa
 const NON_ASCII = /[\u007f-\uffff]/g;
 
 const ASCII_LIMIT = 0x80;

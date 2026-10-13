@@ -52,46 +52,46 @@ const PASSIVE_MESSAGE = "Possible passive voice. Name the actor and use an activ
 const words = (...list: readonly string[]): ReadonlySet<string> => new Set(list);
 
 // A contraction such as isn't or we've. Matches "It isn't" → "isn't"; rejects "It is not" and "the user's".
-// https://regex101.com/?flavor=javascript&regex=%5Cb%5Ba-z%5D%2B%28%3F%3An%5B%27%E2%80%99%5Dt%7C%5B%27%E2%80%99%5D%28%3F%3Are%7Cve%7Cll%7Cd%7Cm%29%29%5Cb&flags=gim&testString=It%20isn%27t%0AIt%20is%20not%0Athe%20user%27s
+// https://regexr.com/?expression=%2F%5Cb%5Ba-z%5D%2B%28%3F%3An%5B%27%E2%80%99%5Dt%7C%5B%27%E2%80%99%5D%28%3F%3Are%7Cve%7Cll%7Cd%7Cm%29%29%5Cb%2Fgim&text=It%20isn%27t%0AIt%20is%20not%0Athe%20user%27s
 const CONTRACTION = /\b[a-z]+(?:n['’]t|['’](?:re|ve|ll|d|m))\b/gi;
 // A form of be followed by an -ing word. Matches "The pump is running" → "is running" (group "running"); rejects "The pump runs".
-// https://regex101.com/?flavor=javascript&regex=%5Cb%28%3F%3Ais%7Care%7Cwas%7Cwere%7Cbe%7Cbeen%29%5Cs%2B%28%5Ba-z%5D%2Bing%29%5Cb&flags=gim&testString=The%20pump%20is%20running%0AThe%20pump%20runs
+// https://regexr.com/?expression=%2F%5Cb%28%3F%3Ais%7Care%7Cwas%7Cwere%7Cbe%7Cbeen%29%5Cs%2B%28%5Ba-z%5D%2Bing%29%5Cb%2Fgim&text=The%20pump%20is%20running%0AThe%20pump%20runs
 const ING_FORM = /\b(?:is|are|was|were|be|been)\s+([a-z]+ing)\b/gi;
 // The first line of a WARNING or CAUTION block. Matches "WARNING: Do not touch" → ("WARNING", "Do not touch"); rejects "A warning sign".
-// https://regex101.com/?flavor=javascript&regex=%5E%5Cs%2A%28%3F%3A%3E%5Cs%2A%29%3F%28%3F%3A%5C%2A%5C%2A%29%3F%28WARNING%7CCAUTION%29%28%3F%3A%5C%2A%5C%2A%29%3F%5Cs%2A%5B%3A.%5C-%E2%80%94%5D%3F%5Cs%2A%28.%2A%29%24&flags=m&testString=WARNING%3A%20Do%20not%20touch%0AA%20warning%20sign
+// https://regexr.com/?expression=%2F%5E%5Cs%2A%28%3F%3A%3E%5Cs%2A%29%3F%28%3F%3A%5C%2A%5C%2A%29%3F%28WARNING%7CCAUTION%29%28%3F%3A%5C%2A%5C%2A%29%3F%5Cs%2A%5B%3A.%5C-%E2%80%94%5D%3F%5Cs%2A%28.%2A%29%24%2Fm&text=WARNING%3A%20Do%20not%20touch%0AA%20warning%20sign
 const WARNING = /^\s*(?:>\s*)?(?:\*\*)?(WARNING|CAUTION)(?:\*\*)?\s*[:.\-—]?\s*(.*)$/;
 // A word, or one character that is not a letter or a space. Splits "Open the panel." into "Open", "the", "panel", ".".
-// https://regex101.com/?flavor=javascript&regex=%5BA-Za-z%5D%5BA-Za-z0-9%27%E2%80%99-%5D%2A%7C%5B%5E%5CsA-Za-z%5D&flags=gm&testString=Open%20the%20panel.
+// https://regexr.com/?expression=%2F%5BA-Za-z%5D%5BA-Za-z0-9%27%E2%80%99-%5D%2A%7C%5B%5E%5CsA-Za-z%5D%2Fgm&text=Open%20the%20panel.
 const WORD_TOKEN = /[A-Za-z][A-Za-z0-9'’-]*|[^\sA-Za-z]/g;
 // An abbreviation whose dot does not end a sentence. Matches "e.g." and "etc."; rejects "end.".
-// https://regex101.com/?flavor=javascript&regex=%5Cb%28%3F%3Ae%5C.g%7Ci%5C.e%7Cetc%7Cvs%7Capprox%7Ccf%29%5C.&flags=gim&testString=See%20e.g.%20this%0Aetc.%0Aend.
+// https://regexr.com/?expression=%2F%5Cb%28%3F%3Ae%5C.g%7Ci%5C.e%7Cetc%7Cvs%7Capprox%7Ccf%29%5C.%2Fgim&text=See%20e.g.%20this%0Aetc.%0Aend.
 const ABBREVIATION = /\b(?:e\.g|i\.e|etc|vs|approx|cf)\./gi;
 // A list marker at the start of a line. Matches "- a" and "2) b"; rejects "-a".
-// https://regex101.com/?flavor=javascript&regex=%5E%5Cs%2A%28%3F%3A%5B-%2A%2B%5D%7C%5B0-9%5D%2B%5B.%29%5D%29%5Cs%2B&flags=m&testString=-%20a%0A2%29%20b%0A-a
+// https://regexr.com/?expression=%2F%5E%5Cs%2A%28%3F%3A%5B-%2A%2B%5D%7C%5B0-9%5D%2B%5B.%29%5D%29%5Cs%2B%2Fm&text=-%20a%0A2%29%20b%0A-a
 const LIST_MARKER = /^\s*(?:[-*+]|[0-9]+[.)])\s+/;
 // The end of a sentence: . ! or ? and then a space or the end. Matches the ends in "One. Two."; rejects "1.5 units".
-// https://regex101.com/?flavor=javascript&regex=%5B.%21%3F%5D%2B%28%3F%3A%5Cs%2B%7C%24%29&flags=gm&testString=One.%20Two.%0A1.5%20units
+// https://regexr.com/?expression=%2F%5B.%21%3F%5D%2B%28%3F%3A%5Cs%2B%7C%24%29%2Fgm&text=One.%20Two.%0A1.5%20units
 const SENTENCE_END = /[.!?]+(?:\s+|$)/g;
 // A token that starts with a letter. Matches "Open"; rejects "." and "7".
-// https://regex101.com/?flavor=javascript&regex=%5E%5BA-Za-z%5D&flags=m&testString=Open%0A.%0A7
+// https://regexr.com/?expression=%2F%5E%5BA-Za-z%5D%2Fm&text=Open%0A.%0A7
 const LETTER_START = /^[A-Za-z]/;
 // A token that starts with a capital letter. Matches "GitHub"; rejects "github".
-// https://regex101.com/?flavor=javascript&regex=%5E%5BA-Z%5D&flags=m&testString=GitHub%0Agithub
+// https://regexr.com/?expression=%2F%5E%5BA-Z%5D%2Fm&text=GitHub%0Agithub
 const CAPITAL_START = /^[A-Z]/;
 // A digit anywhere in a token. Matches "v2"; rejects "vtwo".
-// https://regex101.com/?flavor=javascript&regex=%5B0-9%5D&flags=m&testString=v2%0Avtwo
+// https://regexr.com/?expression=%2F%5B0-9%5D%2Fm&text=v2%0Avtwo
 const HAS_DIGIT = /[0-9]/;
 // Punctuation at the start or the end of a word. Replaced with nothing: "panel," → "panel"; "panel" is unchanged.
-// https://regex101.com/?flavor=javascript&regex=%5E%5B.%2C%3A%3B%5D%2B%7C%5B.%2C%3A%3B%5D%2B%24&flags=gm&testString=panel%2C%0Apanel
+// https://regexr.com/?expression=%2F%5E%5B.%2C%3A%3B%5D%2B%7C%5B.%2C%3A%3B%5D%2B%24%2Fgm&text=panel%2C%0Apanel
 const EDGE_PUNCTUATION = /^[.,:;]+|[.,:;]+$/g;
 // Punctuation, including ! and ?, at the start or the end of a word. Replaced with nothing: "panel!" → "panel"; "panel" is unchanged.
-// https://regex101.com/?flavor=javascript&regex=%5E%5B.%2C%3A%3B%21%3F%5D%2B%7C%5B.%2C%3A%3B%21%3F%5D%2B%24&flags=gm&testString=panel%21%0Apanel
+// https://regexr.com/?expression=%2F%5E%5B.%2C%3A%3B%21%3F%5D%2B%7C%5B.%2C%3A%3B%21%3F%5D%2B%24%2Fgm&text=panel%21%0Apanel
 const EDGE_MARKS = /^[.,:;!?]+|[.,:;!?]+$/g;
 // A run of white space between words. Splits "a  b" into "a" and "b"; "ab" is not split.
-// https://regex101.com/?flavor=javascript&regex=%5Cs%2B&flags=m&testString=a%20%20b%0Aab
+// https://regexr.com/?expression=%2F%5Cs%2B%2Fm&text=a%20%20b%0Aab
 const WHITESPACE = /\s+/;
 // A quote mark at the start of a line. Replaced with nothing: "> text" → " text"; "text" is unchanged.
-// https://regex101.com/?flavor=javascript&regex=%5E%3E&flags=m&testString=%3E%20text%0Atext
+// https://regexr.com/?expression=%2F%5E%3E%2Fm&text=%3E%20text%0Atext
 const QUOTE_MARK = /^>/;
 
 const NOT_ING_VERB = words("bring", "string", "thing", "king", "ring", "spring", "sing", "wing", "sting", "swing", "cling", "fling", "sling", "ceiling", "nothing", "something", "anything", "everything", "morning", "evening", "during", "missing", "following", "existing", "remaining", "matching", "corresponding", "interesting", "surprising", "amazing", "willing", "being");
@@ -121,7 +121,7 @@ const NOT_OBJECT_START = words(
 const STATEMENT_START = words("the", "a", "an", "this", "that", "these", "those", "it", "you", "we", "there", "they", "he", "she", "i");
 
 // A British spelling from a short list that this project wrote. Matches "the colour grey" → "colour" and "grey"; rejects "the color gray".
-// https://regex101.com/?flavor=javascript&regex=%5Cb%28colours%3F%7Cbehaviours%3F%7Cfavour%28%3F%3As%7Cite%7Cites%7Ced%29%3F%7Ccentres%3F%7Cmetres%3F%7Clitres%3F%7Cfibres%3F%7Canalyse%7Canalysed%7Canalysing%7Corganis%28%3F%3Ae%7Ces%7Ced%7Cing%7Cation%7Cations%29%7Crecognis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cinitialis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Csynchronis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Coptimis%28%3F%3Ae%7Ces%7Ced%7Cing%7Cation%29%7Cminimis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cmaximis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cnormalis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cserialis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Ccustomis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cauthoris%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cvisualis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Csummaris%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Ccatalogues%3F%7Cgreys%3F%7Clicences%3F%7Ctravell%28%3F%3Aing%7Ced%7Cer%29%7Ccancell%28%3F%3Aed%7Cing%29%7Cmodell%28%3F%3Aing%7Ced%29%7Clabell%28%3F%3Aed%7Cing%29%7Cdefences%3F%7Cneighbours%3F%7Chonours%3F%7Cprogrammes%3F%7Cartefacts%3F%7Cjudgements%3F%7Cageing%29%5Cb&flags=gim&testString=the%20colour%20grey%0Athe%20color%20gray
+// https://regexr.com/?expression=%2F%5Cb%28colours%3F%7Cbehaviours%3F%7Cfavour%28%3F%3As%7Cite%7Cites%7Ced%29%3F%7Ccentres%3F%7Cmetres%3F%7Clitres%3F%7Cfibres%3F%7Canalyse%7Canalysed%7Canalysing%7Corganis%28%3F%3Ae%7Ces%7Ced%7Cing%7Cation%7Cations%29%7Crecognis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cinitialis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Csynchronis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Coptimis%28%3F%3Ae%7Ces%7Ced%7Cing%7Cation%29%7Cminimis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cmaximis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cnormalis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cserialis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Ccustomis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cauthoris%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Cvisualis%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Csummaris%28%3F%3Ae%7Ces%7Ced%7Cing%29%7Ccatalogues%3F%7Cgreys%3F%7Clicences%3F%7Ctravell%28%3F%3Aing%7Ced%7Cer%29%7Ccancell%28%3F%3Aed%7Cing%29%7Cmodell%28%3F%3Aing%7Ced%29%7Clabell%28%3F%3Aed%7Cing%29%7Cdefences%3F%7Cneighbours%3F%7Chonours%3F%7Cprogrammes%3F%7Cartefacts%3F%7Cjudgements%3F%7Cageing%29%5Cb%2Fgim&text=the%20colour%20grey%0Athe%20color%20gray
 const BRITISH = new RegExp(
   String.raw`\b(colours?|behaviours?|favour(?:s|ite|ites|ed)?|centres?|metres?|litres?|fibres?|analyse|analysed|analysing|` +
     String.raw`organis(?:e|es|ed|ing|ation|ations)|recognis(?:e|es|ed|ing)|initialis(?:e|es|ed|ing)|synchronis(?:e|es|ed|ing)|` +
