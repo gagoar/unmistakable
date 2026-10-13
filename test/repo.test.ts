@@ -39,7 +39,7 @@ const NEGATION = /(?:\bnot|\bno|\bnever|n't|\bnor)\s+(?:\w+,?\s+){0,4}$/;
 const README_SAMPLE = /\$ echo "We spin up the box; it isn't running\." \| node scripts\/ste-lint\.ts\n([\s\S]*?)\n```/;
 // A template placeholder that names a credential. Matches a dollar sign and braces around "apiKey" or "secretValue"; rejects the same wrapper around "name".
 const CREDENTIAL_PLACEHOLDER = /\$\{[^}]*(?:key|token|secret|password|credential)[^}]*\}/i;
-// A copy of the whole environment. Matches "{ ...process.env }"; rejects "process.env.PATH".
+// A copy of the whole process environment: a spread, a stringify call, or an assign call that takes the object. Matches the "spread" form; rejects the read of one named variable.
 const WHOLE_ENV = /\.\.\.process\.env\b|JSON\.stringify\(process\.env\)|Object\.assign\([^)]*process\.env/;
 // The name of a script or a document, which the scanner reads as text. Matches "core.ts" and "index.html"; rejects "logo.png".
 const TEXT_FILE = /\.(?:ts|md|html|json|sh|yml|yaml|txt)$/;
