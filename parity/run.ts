@@ -37,13 +37,10 @@ const SHIFT_C = 14;
 
 // A 40-character commit hash, as a hex string.
 // Matches "32511c6992ecb5f1971e46a2943f2e6adceedafe"; rejects "32511c6".
-// https://regexr.com/?expression=%2F%5B0-9a-f%5D%7B40%7D%2Fgm&text=32511c6992ecb5f1971e46a2943f2e6adceedafe%0A32511c6
 const COMMIT = /[0-9a-f]{40}/;
 // White space anywhere, which base64 text from the GitHub API may hold. Replaced with nothing: "YQ==\n" → "YQ==".
-// https://regexr.com/?expression=%2F%5Cs%2Fg&text=YQ%3D%3D%0A%0AYQ%3D%3D
 const ANY_SPACE = /\s/g;
 // The newline that Python's print adds at the end of its output. Replaced with nothing: "{}\n" → "{}"; "{}" is unchanged.
-// https://regexr.com/?expression=%2F%5Cn%24%2Fgm&text=%7B%7D%0A%0A%7B%7D
 const FINAL_NEWLINE = /\n$/;
 
 function upstreamScript(): string {

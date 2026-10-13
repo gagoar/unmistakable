@@ -7,7 +7,7 @@ Rules an agent cannot infer from the code:
 
 - Write TypeScript with the `typescript-patterns-enforcer` skill, and run its hook on every file you touch:
   `echo '{"tool_input":{"file_path":"<file>"}}' | node <enforcer>/engine/dist/check.js`. No `any`, no `switch`, no
-  raw loop, no magic number, no nested ternary. Every regex has a comment with an example and a regexr.com tester link. Use no regex101.com link: the directory scan holds the plugin for it. A test checks that.
+  raw loop, no magic number, no nested ternary. Every regex has a comment with an example, and a row in `REGEXES.md` with its tester link. Put no tester link in a code file: the directory scan holds the plugin for review when a code file has a remote URL. A test checks both. The `require-regex-example` hook asks for a link in the comment: ignore that one finding.
 - Node must run the files as they are, so use only syntax that Node can strip: no `enum`, no `namespace`, no
   parameter properties. Import with the `.ts` extension, and use `import type` for types.
 - Ship no binary and no bundle. A native file, or a file over 1 MiB, holds the plugin for review in the directory scan.

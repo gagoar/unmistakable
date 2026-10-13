@@ -13,11 +13,9 @@ const WORDS_OVER_PROCEDURE_LIMIT = 22;
 const EXIT_USAGE = 2;
 const EXIT = { ok: 0, findings: 1, usage: EXIT_USAGE } as const;
 // Newlines at the end of a text. Replaced with nothing: "a\n\n" → "a"; "a" is unchanged.
-// https://regexr.com/?expression=%2F%5Cn%2B%24%2Fm&text=a%0A%0A%0Aa
 const TRAILING_NEWLINES = /\n+$/;
 
 // The .json extension at the end of a file name. Replaced with nothing: "a.md.json" → "a.md"; "a.json.md" is unchanged.
-// https://regexr.com/?expression=%2F%5C.json%24%2Fm&text=a.md.json%0Aa.json.md
 const JSON_EXTENSION = /\.json$/;
 
 // --json must equal upstream's own output, byte for byte, for every test input. Upstream labels each

@@ -72,14 +72,12 @@ function parse(argv: readonly string[], options: Options = DEFAULTS): Options {
 }
 
 // A whole number. Matches "12"; rejects "-1" and "x".
-// https://regexr.com/?expression=%2F%5E%5Cd%2B%24%2Fm&text=12%0A-1%0Ax
 const WHOLE_NUMBER = /^\d+$/;
 
 // The Python script reads in text mode, so a line break is one "\n" whatever the file used.
 const universalNewlines = (text: string): string => text.replace(CR_LF, "\n");
 
 // A carriage return, with or without a line feed. Replaced by "\n": "a\r\nb" → "a\nb"; "a\nb" is unchanged.
-// https://regexr.com/?expression=%2F%5Cr%5Cn%3F%2Fgm&text=a%0D%0Ab%0Aa%0Ab
 const CR_LF = /\r\n?/g;
 
 export interface Io {
