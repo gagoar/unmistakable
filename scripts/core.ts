@@ -34,8 +34,25 @@ const NOT_FOUND = -1;
 const EVEN = 2;
 const DANGLING_MESSAGE = "List item ends with a coordinating conjunction. Complete the item or join it with the next item.";
 
-const IRREGULAR_PARTICIPLES = "given|taken|made|done|found|seen|known|shown|written|built|sent|set|run|read|kept|held|left|put|cut|hit|let|shut|split|spread|begun|become|come|gone|got|gotten|lost|met|paid|said|sold|told|thought|brought|bought|caught|taught|won|worn|torn|born|drawn|grown|thrown|flown|driven|risen|chosen|broken|spoken|frozen|hidden|ridden|forgotten|fallen|eaten|beaten|understood|stood|struck|stuck|swung|hung|led|fed|bled|fled|sped|bound|wound|dug|spun|slid|bit|lit|quit";
-const PASSIVE_PARTICIPLES = "given|taken|made|done|found|seen|known|shown|written|built|sent|set|run|read|kept|held|left|put";
+const IRREGULAR_PARTICIPLES_LIST = [
+  "given", "taken", "made", "done", "found", "seen", "known", "shown",
+  "written", "built", "sent", "set", "run", "read", "kept", "held",
+  "left", "put", "cut", "hit", "let", "shut", "split", "spread",
+  "begun", "become", "come", "gone", "got", "gotten", "lost", "met",
+  "paid", "said", "sold", "told", "thought", "brought", "bought", "caught",
+  "taught", "won", "worn", "torn", "born", "drawn", "grown", "thrown",
+  "flown", "driven", "risen", "chosen", "broken", "spoken", "frozen", "hidden",
+  "ridden", "forgotten", "fallen", "eaten", "beaten", "understood", "stood", "struck",
+  "stuck", "swung", "hung", "led", "fed", "bled", "fled", "sped",
+  "bound", "wound", "dug", "spun", "slid", "bit", "lit", "quit",
+] as const;
+const IRREGULAR_PARTICIPLES = IRREGULAR_PARTICIPLES_LIST.join("|");
+const PASSIVE_PARTICIPLES_LIST = [
+  "given", "taken", "made", "done", "found", "seen", "known", "shown",
+  "written", "built", "sent", "set", "run", "read", "kept", "held",
+  "left", "put",
+] as const;
+const PASSIVE_PARTICIPLES = PASSIVE_PARTICIPLES_LIST.join("|");
 
 // A modal verb, with an optional negation, that ends the text before a match. Matches "The task may not " and "It couldn't "; rejects "The task has ".
 const MODAL_PERFECT_PREFIX = /\b(?:may|might|could|should|would|must|can|will|shall)(?:\s+not|n['’]t)?\s+$/i;
@@ -113,7 +130,7 @@ interface Match {
   readonly text: string;
 }
 
-// RegExpMatchArray.index is optional in the types and always set for matchAll.
+// RegExpMatchArray.index is optional in the types and always present for matchAll.
 const matchesOf = (pattern: RegExp, text: string): Match[] => [...text.matchAll(pattern)].map((m) => ({ index: m.index ?? 0, text: m[0] }));
 
 // Whether each line opens or closes a code fence, or sits inside one.

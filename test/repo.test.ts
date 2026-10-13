@@ -163,7 +163,7 @@ const SELF = "test/repo.test.ts";
 const CODE_FILE = /^(?:scripts|test|parity)\/.*\.ts$/;
 // A named regex at the top level of a file. Matches "const SEMVER = /^a$/;" → ("SEMVER"); rejects "const x = 1;".
 const REGEX_DECLARATION = /^(?:export )?const (\w+)(?:: RegExp)? = \//gm;
-// A row of REGEXES.md. Matches "| `scripts/core.ts` | `SEMVER` | [open](https://a.test) |" → ("scripts/core.ts", "SEMVER"); rejects a heading.
+// A row of REGEXES.md. Matches "| `scripts/core.ts` | `SEMVER` |" → ("scripts/core.ts", "SEMVER"); rejects a heading.
 const REGEX_ROW = /^\| `([^`]+)` \| `([^`]+)` \|/gm;
 
 // The scanner holds a plugin for review when a code file has a remote URL beside a word that names a credential.
