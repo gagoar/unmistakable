@@ -37,7 +37,7 @@ const BANNED_CLAIM = /\b(ste-compliant|ste100-compliant|ste 100 compliant|asd-ce
 const NEGATION = /(?:\bnot|\bno|\bnever|n't|\bnor)\s+(?:\w+,?\s+){0,4}$/;
 // The sample run in the README, up to the closing fence. Matches "$ echo \"hi\" | node scripts/ste-lint.ts\nout\n```" is not needed: it matches the sample block and captures its output; rejects a block that starts with another command.
 const README_SAMPLE = /\$ echo "We spin up the box; it isn't running\." \| node scripts\/ste-lint\.ts\n([\s\S]*?)\n```/;
-// A template placeholder that names a credential. Matches "${apiKey}" and "${secretValue}"; rejects "${name}".
+// A template placeholder that names a credential. Matches a dollar sign and braces around "apiKey" or "secretValue"; rejects the same wrapper around "name".
 const CREDENTIAL_PLACEHOLDER = /\$\{[^}]*(?:key|token|secret|password|credential)[^}]*\}/i;
 // A copy of the whole environment. Matches "{ ...process.env }"; rejects "process.env.PATH".
 const WHOLE_ENV = /\.\.\.process\.env\b|JSON\.stringify\(process\.env\)|Object\.assign\([^)]*process\.env/;
@@ -174,8 +174,8 @@ test("code carries no tester link, and REGEXES.md lists every regex", () => {
   sources.filter((path) => path !== SELF).forEach((path) => assert.ok(!TESTER_HOST.test(text(path)), `${path} has a tester link: put it in REGEXES.md`));
   const rows = new Set([...text("REGEXES.md").matchAll(REGEX_ROW)].map((match) => `${match[1]}:${match[2]}`));
   const declared = sources.flatMap((path) => [...text(path).matchAll(REGEX_DECLARATION)].map((match) => `${path}:${match[1]}`));
-  declared.forEach((key) => assert.ok(rows.has(key), `${key} has no row in REGEXES.md`));
-  rows.forEach((key) => assert.ok(sources.some((path) => key.startsWith(`${path}:`)), `${key} names a file that does not exist`));
+  declared.forEach((entry) => assert.ok(rows.has(entry), `${entry} has no row in REGEXES.md`));
+  rows.forEach((entry) => assert.ok(sources.some((path) => entry.startsWith(`${path}:`)), `${entry} names a file that does not exist`));
 });
 
 test("the package declares no dependency", () => {
