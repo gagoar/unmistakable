@@ -38,27 +38,20 @@ const IRREGULAR_PARTICIPLES = "given|taken|made|done|found|seen|known|shown|writ
 const PASSIVE_PARTICIPLES = "given|taken|made|done|found|seen|known|shown|written|built|sent|set|run|read|kept|held|left|put";
 
 // A modal verb, with an optional negation, that ends the text before a match. Matches "The task may not " and "It couldn't "; rejects "The task has ".
-// https://regexr.com/?expression=%2F%5Cb%28%3F%3Amay%7Cmight%7Ccould%7Cshould%7Cwould%7Cmust%7Ccan%7Cwill%7Cshall%29%28%3F%3A%5Cs%2Bnot%7Cn%5B%27%E2%80%99%5Dt%29%3F%5Cs%2B%24%2Fim&text=The%20task%20may%20not%20%0AIt%20couldn%27t%20%0AThe%20task%20has%20
 const MODAL_PERFECT_PREFIX = /\b(?:may|might|could|should|would|must|can|will|shall)(?:\s+not|n['’]t)?\s+$/i;
 // A semicolon. Matches "a; b" → ";"; rejects "a, b".
-// https://regexr.com/?expression=%2F%3B%2Fgm&text=a%3B%20b%0Aa%2C%20b
 const SEMICOLON = /;/g;
 // A soft phrasal verb from a short list. Matches "We spin up the job" → "spin up"; rejects "We start the job".
-// https://regexr.com/?expression=%2F%5Cb%28spin%28%3F%3Aning%7Cs%29%3F%20up%7Cspun%20up%7Creach%28%3F%3Aing%7Ces%7Ced%29%3F%20out%7Cdiv%28%3F%3Ae%7Ces%7Cing%7Ced%29%20into%7Cdove%20into%7Ckick%28%3F%3Aing%7Cs%7Ced%29%3F%20off%7Ccircl%28%3F%3Ae%7Ces%7Cing%7Ced%29%20back%7Ctouch%28%3F%3Aing%7Ces%7Ced%29%3F%20base%29%5Cb%2Fgim&text=We%20spin%20up%20the%20job%0AWe%20start%20the%20job
 const PHRASAL_VERB = /\b(spin(?:ning|s)? up|spun up|reach(?:ing|es|ed)? out|div(?:e|es|ing|ed) into|dove into|kick(?:ing|s|ed)? off|circl(?:e|es|ing|ed) back|touch(?:ing|es|ed)? base)\b/gi;
 // A marketing adjective from a short list. Matches "a seamless fit" → "seamless"; rejects "a close fit".
-// https://regexr.com/?expression=%2F%5Cb%28seamless%28%3F%3Aly%29%3F%7Crobust%28%3F%3Aly%29%3F%7Ccutting-edge%7Ceffortless%28%3F%3Aly%29%3F%7Cblazing%5B-%20%5Dfast%7Cworld-class%7Cstate-of-the-art%7Cgame-chang%28%3F%3Aing%7Cer%29%29%5Cb%2Fgim&text=a%20seamless%20fit%0Aa%20close%20fit
 const MARKETING = /\b(seamless(?:ly)?|robust(?:ly)?|cutting-edge|effortless(?:ly)?|blazing[- ]fast|world-class|state-of-the-art|game-chang(?:ing|er))\b/gi;
 // A light verb plus a noun made from an action. Matches "Perform an analysis" → "Perform an analysis"; rejects "Analyze the log".
-// https://regexr.com/?expression=%2F%5Cb%28perform%7Cperforms%7Cperformed%7Cconduct%7Cconducts%7Cconducted%7Ccarry%20out%7Ccarries%20out%7Ccarried%20out%29%5Cs%2B%28%3F%3Aa%7Can%7Cthe%29%5Cs%2B%5Cw%2B%28%3F%3Ation%7Csion%7Cment%7Cance%7Cence%7Cysis%29%5Cb%2Fgim&text=Perform%20an%20analysis%0AAnalyze%20the%20log
 const NOMINALIZATION = /\b(perform|performs|performed|conduct|conducts|conducted|carry out|carries out|carried out)\s+(?:a|an|the)\s+\w+(?:tion|sion|ment|ance|ence|ysis)\b/gi;
 
 // A form of be and then a past participle, unless the participle leads into to, for or by and an -ing word. Matches "The panel is removed" → "is removed"; rejects "The tool is used for parsing".
-// https://regexr.com/?expression=%2F%5Cb%28is%7Care%7Cwas%7Cwere%7Cbeen%7Cbeing%29%5Cs%2B%28%5Cw%2Bed%7Cgiven%7Ctaken%7Cmade%7Cdone%7Cfound%7Cseen%7Cknown%7Cshown%7Cwritten%7Cbuilt%7Csent%7Cset%7Crun%7Cread%7Ckept%7Cheld%7Cleft%7Cput%29%5Cb%28%3F%21%5Cs%2B%28%3F%3Ato%7Cfor%7Cby%29%5Cs%2B%5Cw%2Bing%29%2Fgim&text=The%20panel%20is%20removed%0AThe%20tool%20is%20used%20for%20parsing
 const PASSIVE = new RegExp(String.raw`\b(is|are|was|were|been|being)\s+(\w+ed|${PASSIVE_PARTICIPLES})\b(?!\s+(?:to|for|by)\s+\w+ing)`, "gi");
 
 // Has, have or had and then a past participle, unless a modal verb comes first. Matches "We have received it" → "have received"; rejects "It may have failed".
-// https://regexr.com/?expression=%2F%28%3F%3C%21%5Cbmay%20%29%28%3F%3C%21%5Cbmight%20%29%28%3F%3C%21%5Cbcould%20%29%28%3F%3C%21%5Cbshould%20%29%28%3F%3C%21%5Cbwould%20%29%28%3F%3C%21%5Cbmust%20%29%5Cb%28has%7Chave%7Chad%29%5Cs%2B%28%3F%3Abeen%5Cs%2B%29%3F%28%3F%3A%5Cw%2B%28%3F%3Aed%7Cen%29%7Cgiven%7Ctaken%7Cmade%7Cdone%7Cfound%7Cseen%7Cknown%7Cshown%7Cwritten%7Cbuilt%7Csent%7Cset%7Crun%7Cread%7Ckept%7Cheld%7Cleft%7Cput%7Ccut%7Chit%7Clet%7Cshut%7Csplit%7Cspread%7Cbegun%7Cbecome%7Ccome%7Cgone%7Cgot%7Cgotten%7Clost%7Cmet%7Cpaid%7Csaid%7Csold%7Ctold%7Cthought%7Cbrought%7Cbought%7Ccaught%7Ctaught%7Cwon%7Cworn%7Ctorn%7Cborn%7Cdrawn%7Cgrown%7Cthrown%7Cflown%7Cdriven%7Crisen%7Cchosen%7Cbroken%7Cspoken%7Cfrozen%7Chidden%7Cridden%7Cforgotten%7Cfallen%7Ceaten%7Cbeaten%7Cunderstood%7Cstood%7Cstruck%7Cstuck%7Cswung%7Chung%7Cled%7Cfed%7Cbled%7Cfled%7Csped%7Cbound%7Cwound%7Cdug%7Cspun%7Cslid%7Cbit%7Clit%7Cquit%29%5Cb%2Fgim&text=We%20have%20received%20it%0AIt%20may%20have%20failed
 const PERFECT = new RegExp(
   String.raw`(?<!\bmay )(?<!\bmight )(?<!\bcould )(?<!\bshould )(?<!\bwould )(?<!\bmust )\b(has|have|had)\s+(?:been\s+)?(?:\w+(?:ed|en)|${IRREGULAR_PARTICIPLES})\b`,
   "gi",
@@ -88,37 +81,27 @@ const SYNONYM_GROUPS: readonly (readonly string[])[] = [
 ];
 
 // A line that opens or closes a fenced code block. Matches "```ts" and "~~~"; rejects "``x``".
-// https://regexr.com/?expression=%2F%5E%28%60%60%60%7C~~~%29%2Fm&text=%60%60%60ts%0A~~~%0A%60%60x%60%60
 const CODE_FENCE = /^(```|~~~)/;
 // A code span between backticks. Matches "use `x` here" → "`x`"; rejects "use x here".
-// https://regexr.com/?expression=%2F%60%5B%5E%60%5D%2A%60%2Fgm&text=use%20%60x%60%20here%0Ause%20x%20here
 const INLINE_CODE = /`[^`]*`/g;
 // The start of a Markdown list item: 0 to 3 spaces, a marker, spaces, then the text. Matches "  - a and" → ("  ", "-", " ", "a and"); rejects "    - code" and "-text".
-// https://regexr.com/?expression=%2F%5E%28%20%7B0%2C3%7D%29%28%5B-%2A%2B%5D%7C%5B0-9%5D%2B%5B.%29%5D%29%28%20%2B%29%28.%2A%29%24%2Fm&text=%20%20-%20a%20and%0A%20%20%20%20-%20code%0A-text
 const LIST_ITEM_START = /^( {0,3})([-*+]|[0-9]+[.)])( +)(.*)$/;
 // A line that ends with and or or. Matches "Start the task and" → "and"; rejects "Start the task.".
-// https://regexr.com/?expression=%2F%5Cb%28%3F%3Aand%7Cor%29%5Cs%2A%24%2Fim&text=Start%20the%20task%20and%0AStart%20the%20task.
 const CONJUNCTION_END = /\b(?:and|or)\s*$/i;
 // A Markdown table separator cell: 3 or more dashes, with optional colons. Matches "---" and ":--:"; rejects "--" and "a-b".
-// https://regexr.com/?expression=%2F%5E%3A%3F-%7B3%2C%7D%3A%3F%24%2Fm&text=---%0A%3A---%3A%0A--%0Aa-b
 const TABLE_SEPARATOR_CELL = /^:?-{3,}:?$/;
 // A pipe that no backslash escapes. Splits "a|b" into "a" and "b"; "a\|b" is not split.
-// https://regexr.com/?expression=%2F%28%3F%3C%21%5C%5C%29%5C%7C%2Fm&text=a%7Cb%0Aa%5C%7Cb
 const UNESCAPED_PIPE = /(?<!\\)\|/;
 // A pipe at the end of a table row. Replaced with nothing: "a|b|" → "a|b"; "a|b" is unchanged.
-// https://regexr.com/?expression=%2F%5C%7C%24%2Fm&text=a%7Cb%7C%0Aa%7Cb
 const TRAILING_PIPE = /\|$/;
 // Spaces at the start of a line (not tabs). Matches "  x" → "  "; rejects "x" and "\tx".
-// https://regexr.com/?expression=%2F%5E%20%2B%2Fm&text=%20%20x%0Ax%0A%09x
 const ASCII_LEADING_SPACES = /^ +/;
 // The white space after a . ! or ?. Splits "One. Two" into "One." and "Two"; "One two" is not split.
-// https://regexr.com/?expression=%2F%28%3F%3C%3D%5B.%21%3F%5D%29%5B%5Ct-%5Cr%5Cx1c-%5Cx1f%20%5Cx85%5Cxa0%5Cu1680%5Cu2000-%5Cu200a%5Cu2028%5Cu2029%5Cu202f%5Cu205f%5Cu3000%5D%2B%2Fm&text=One.%20Two%0AOne%20two
 const SENTENCE_GAP = /(?<=[.!?])[\t-\r\x1c-\x1f \x85\xa0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+/;
 
 export { CODE_FENCE, INLINE_CODE };
 
 // A verb of a synonym group, with its endings; here the group member check. Matches "Checking the log" → "Checking"; rejects "Checkpoint".
-// https://regexr.com/?expression=%2F%5Cbcheck%28%3F%3As%7Ces%7Ced%7Cd%7Cing%29%3F%5Cb%2Fim&text=Checking%20the%20log%0ACheckpoint
 const synonymPattern = (base: string): RegExp => new RegExp(String.raw`\b${base}(?:s|es|ed|d|ing)?\b`, "i");
 const SYNONYM_RES: ReadonlyMap<string, RegExp> = new Map(SYNONYM_GROUPS.flat().map((base) => [base, synonymPattern(base)]));
 
