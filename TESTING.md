@@ -8,7 +8,7 @@ tsc -p .
 claude plugin validate --strict .
 ```
 
-`tsc` needs `typescript` and `@types/node`. Install them without saving: `npm i --no-save typescript @types/node`.
+`tsc` needs the `typescript` and `@types/node` packages. Install them with your package manager, and do not save them to `package.json`: the plugin has no dependency. The `test` job in `.github/workflows/ci.yml` shows the exact step.
 
 | Test | What it proves |
 |---|---|
