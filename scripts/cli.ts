@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { failed, lintText, merge, PROFILES, toJSON, toText, type LintOptions, type Profile, type Report } from "./stelint.ts";
 
-const VERSION = "0.2.1";
+const VERSION = "0.2.2";
 const EXIT_OK = 0;
 const EXIT_FINDINGS = 1;
 const EXIT_USAGE = 2;
