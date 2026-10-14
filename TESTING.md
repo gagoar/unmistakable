@@ -24,8 +24,9 @@ node parity/run.ts
 STE_PARITY_N=5000 node parity/run.ts
 ```
 
-This needs `python3` and `gh`. It fetches `ste-lint.py` at the pinned commit with `gh` and compares it with the TypeScript
-output on every test input, hand-written snippets and seeded random text.
+This needs `python3` and the GitHub CLI. It compares the TypeScript output with the output of upstream's script at the
+pinned commit, on every test input, hand-written snippets and seeded random text. `parity/README.md` says how the
+reference script gets to your machine.
 
 ## Plugin evals (by hand)
 
