@@ -1,7 +1,8 @@
 {
   "name": "unmistakable",
   "displayName": "unmistakable",
-  "version": "0.2.2",
+  "version": "0.2.3",
+  "icon": "./.claude-plugin/icon.png",
   "description": "Rewrite English so an AI agent cannot misread it. Tool descriptions, error messages, PR descriptions and agent instructions, with a deterministic linter. Follows the ASD-STE100 rules.",
   "author": {
     "name": "gagoar",
