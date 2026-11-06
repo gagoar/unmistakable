@@ -1,6 +1,6 @@
 # Parity check against upstream
 
-`scripts/` ports `scripts/ste-lint.py` from github.com/danyuchn/asd-ste100-skill. This optional check proves that
+`plugins/unmistakable/scripts/` ports `scripts/ste-lint.py` from github.com/danyuchn/asd-ste100-skill. This optional check proves that
 `--profile upstream` gives the same output as the Python script, byte for byte. It is for maintainers: the normal
 tests need no Python.
 

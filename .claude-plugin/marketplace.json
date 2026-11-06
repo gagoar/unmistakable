@@ -13,7 +13,7 @@
       "license": "MIT",
       "keywords": ["writing", "technical-writing", "plain-english", "ste", "linter", "agents"],
       "category": "productivity",
-      "source": "./"
+      "source": "./plugins/unmistakable"
     }
   ]
 }

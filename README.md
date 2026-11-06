@@ -29,7 +29,7 @@ Then ask in plain words: "rewrite this tool description so an agent cannot misre
 `scripts/ste-lint.ts` is TypeScript that Node runs as it is: Node 22.18 or later, no build step, no binary, nothing to install. The skill runs it on its own output, and you can run it on any file.
 
 ```
-$ echo "We spin up the box; it isn't running." | node scripts/ste-lint.ts
+$ echo "We spin up the box; it isn't running." | node plugins/unmistakable/scripts/ste-lint.ts
 <stdin>:1:4 phrasal-verb (STE-9.3): Soft phrasal verb. Use the single plain verb (start, contact, read, begin). [spin up]
 <stdin>:1:19 semicolon (STE-8.1): STE bans the semicolon (Rule 8.1). Split into separate sentences. [;]
 <stdin>:1:24 contraction (STE-4.2): Contraction. Write the full words (do not, it is, cannot). [isn't]
@@ -55,8 +55,8 @@ The linter has no part-of-speech tagger. It finds structure, not meaning. It doe
 
 | | |
 |---|---|
-| `skills/asd-ste100/` | The skill: when to use it, the rewrite rules, the output format, worked examples |
-| `scripts/` | The linter, in TypeScript with no dependency. About 60 KB in all, and no file over 25 KB |
+| `plugins/unmistakable/skills/asd-ste100/` | The skill: when to use it, the rewrite rules, the output format, worked examples |
+| `plugins/unmistakable/scripts/` | The linter, in TypeScript with no dependency. About 60 KB in all, and no file over 25 KB |
 | `test/`, `testdata/`, `parity/` | The tests, upstream's own golden files, and the check against the Python script |
 | `UPSTREAM.md` | Where the skill comes from, and every change made to it |
 
@@ -78,4 +78,4 @@ MIT license: use it, change it and share it, with the notice. It comes as it is,
 
 ## License
 
-MIT. The upstream notice is in `LICENSE-UPSTREAM`.
+MIT. The upstream notice is in `plugins/unmistakable/LICENSE-UPSTREAM`.

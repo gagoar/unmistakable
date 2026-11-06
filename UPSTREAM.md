@@ -2,7 +2,7 @@
 
 This repository packages the `asd-ste100` skill of
 [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill) as a Claude Code plugin.
-Upstream is MIT licensed, © 2026 Dustin Yuchen Teng. The full text is in `LICENSE-UPSTREAM`.
+Upstream is MIT licensed, © 2026 Dustin Yuchen Teng. The full text is in `plugins/unmistakable/LICENSE-UPSTREAM`.
 
 | | |
 |---|---|
@@ -12,8 +12,8 @@ Upstream is MIT licensed, © 2026 Dustin Yuchen Teng. The full text is in `LICEN
 
 ## What comes from upstream
 
-- `skills/asd-ste100/SKILL.md`, `references/writing-rules.md`, `examples/*.md`: the skill text.
-- `scripts/`: a TypeScript port of `scripts/ste-lint.py`. Under `--profile upstream` it gives the same output as the
+- `plugins/unmistakable/skills/asd-ste100/SKILL.md`, `references/writing-rules.md`, `examples/*.md`: the skill text.
+- `plugins/unmistakable/scripts/`: a TypeScript port of `scripts/ste-lint.py`. Under `--profile upstream` it gives the same output as the
   Python script, byte for byte: `node parity/run.ts` proves it on the test inputs, on hand-written snippets and on
   random text. The test inputs and the golden files in `testdata/` are upstream's own.
 
@@ -30,7 +30,7 @@ Upstream is MIT licensed, © 2026 Dustin Yuchen Teng. The full text is in `LICEN
    is labeled `X-`.
 6. Part 1 of `examples/before-after.md` is titled "Rule Illustrations", not "Official STE Examples": the
    examples are not ASD's.
-7. `scripts/ste-lint.py` is not shipped. The skill runs `node scripts/ste-lint.ts`.
+7. `scripts/ste-lint.py` is not shipped. The skill runs `node "${CLAUDE_PLUGIN_ROOT}/scripts/ste-lint.ts"`.
 
 **The linter.** It is TypeScript that Node runs as it is, so no binary ships. `--profile upstream` gives upstream's output, byte for byte. The other profiles
 (`agent`, the default, `descriptive`, `procedure`) label each finding with its rule number in a `spec` field and

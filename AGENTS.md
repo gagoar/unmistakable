@@ -13,6 +13,10 @@ Rules an agent cannot infer from the code:
 - Ship no binary and no bundle. A native file, or a file over 1 MiB, holds the plugin for review in the directory scan.
   A script or a document over 256 KiB is not read in full. A test checks both, and it checks that no top-level `bin/`
   exists (it stops the install on Cowork and claude.ai).
+- The marketplace entry points at `plugins/unmistakable/`. Only the runtime files live there: the manifest, the icon
+  (the one binary), `skills/`, `scripts/` (but `render-assets.sh`) and the licences. Keep `package.json`, tests, docs and
+  `TESTING.md` outside it: the directory scan reads that directory only. A test checks that the plugin holds no
+  `package*.json` and that the `icon` path in `plugin.json` leads to the PNG.
 - Add no dependency. `package.json` has none. CI installs `typescript` and `@types/node` for `tsc` only, and does not save them.
 - `--profile upstream` must equal upstream's `ste-lint.py --json` byte for byte. The golden files in
   `testdata/golden/` are upstream's own output. Never regenerate them with this code.
@@ -20,10 +24,10 @@ Rules an agent cannot infer from the code:
 - A rule number (`STE-6.6`) names a rule of ASD-STE100 Issue 9. Never copy the dictionary, the words to avoid,
   an official example or the text of a rule into this repository. ASD owns the copyright. Never write that a text
   or this tool is "STE-compliant", certified or endorsed. A test checks the README, the docs and the manifests.
-- The footer of every page in `docs/` shows the version in `.claude-plugin/plugin.json`. A test checks it.
-- The sample output in `README.md` is the real output of `scripts/ste-lint.ts`. A test checks it. After a change to a
+- The footer of every page in `docs/` shows the version in `plugins/unmistakable/.claude-plugin/plugin.json`. A test checks it.
+- The sample output in `README.md` is the real output of `plugins/unmistakable/scripts/ste-lint.ts`. A test checks it. After a change to a
   check, copy the new output in.
 - After a change to `docs/assets/*.html`, run `scripts/render-assets.sh` and commit the images.
 - Keep the skill's name `asd-ste100`. pr-brief calls the skill by that name.
 - Upstream changes go in by hand. Update the pinned commit in `UPSTREAM.md` and run `node parity/run.ts`.
-- Check: `node --test "test/*.test.ts"`, then `tsc -p .`, then `claude plugin validate --strict .`
+- Check: `node --test "test/*.test.ts"`, then `tsc -p .`, then `claude plugin validate --strict .` and `claude plugin validate --strict plugins/unmistakable`

@@ -4,9 +4,12 @@ import assert from "node:assert/strict";
 import { closeSync, openSync, readdirSync, readFileSync, readSync, statSync } from "node:fs";
 import { basename, join, relative } from "node:path";
 import { test } from "node:test";
-import { cli, ROOT } from "./helpers.ts";
+import { cli, PLUGIN, ROOT } from "./helpers.ts";
 
 const MAX_FILE_BYTES = 5_242_880; // 5 MiB: the directory rejects a file over this size
+const MAX_PLUGIN_BYTES = 1_048_576; // 1 MiB: the directory scan holds a plugin for review when a file is over this size
+const PNG_MAGIC = "89504e47"; // the first four bytes of a PNG, as hex
+const MAX_PLUGIN_FILES = 20; // the plugin directory holds the runtime files only
 const MAX_TEXT_BYTES = 262_144; // 256 KiB: the scanner reads a script or a document only up to this size
 const MIN_DESCRIPTION = 40;
 const MAGIC_BYTES = 4;
@@ -35,8 +38,8 @@ const SKILL_DESCRIPTION = new RegExp(`^description: .{${MIN_DESCRIPTION},}`, "m"
 const BANNED_CLAIM = /\b(ste-compliant|ste100-compliant|ste 100 compliant|asd-certified|ste-certified|fully compliant|endorsed by asd|asd-approved)\b/gi;
 // A negation within the last 5 words before a claim. Matches "is not made, checked or "; rejects "is made, checked or ".
 const NEGATION = /(?:\bnot|\bno|\bnever|n't|\bnor)\s+(?:\w+,?\s+){0,4}$/;
-// The sample run in the README, up to the closing fence. Matches "$ echo \"hi\" | node scripts/ste-lint.ts\nout\n```" is not needed: it matches the sample block and captures its output; rejects a block that starts with another command.
-const README_SAMPLE = /\$ echo "We spin up the box; it isn't running\." \| node scripts\/ste-lint\.ts\n([\s\S]*?)\n```/;
+// The sample run in the README, up to the closing fence. Matches "$ echo \"hi\" | node plugins/unmistakable/scripts/ste-lint.ts\nout\n```" is not needed: it matches the sample block and captures its output; rejects a block that starts with another command.
+const README_SAMPLE = /\$ echo "We spin up the box; it isn't running\." \| node plugins\/unmistakable\/scripts\/ste-lint\.ts\n([\s\S]*?)\n```/;
 // A template placeholder that names a credential. Matches a dollar sign and braces around "apiKey" or "secretValue"; rejects the same wrapper around "name".
 const CREDENTIAL_PLACEHOLDER = /\$\{[^}]*(?:key|token|secret|password|credential)[^}]*\}/i;
 // A use of the environment object as a whole value: its name with no dot or bracket after it. Matches the bare "env" object, as a spread or an argument does; rejects a read of one entry by name.
@@ -49,6 +52,7 @@ const IMAGE_FILE = /\.(?:png|jpe?g|gif|webp|ico)$/i;
 const isText = (path: string): boolean => TEXT_FILE.test(path) || TEXT_NAMES.has(basename(path));
 
 const text = (...parts: readonly string[]): string => readFileSync(join(ROOT, ...parts), "utf8");
+const plug = (...parts: readonly string[]): string => readFileSync(join(PLUGIN, ...parts), "utf8"); // a file inside the plugin directory
 
 interface Manifest {
   readonly name: string;
@@ -64,7 +68,7 @@ const isManifest = (value: unknown): value is Manifest => {
 };
 
 function manifest(): Manifest {
-  const parsed: unknown = JSON.parse(text(".claude-plugin", "plugin.json"));
+  const parsed: unknown = JSON.parse(plug(".claude-plugin", "plugin.json"));
   if (!isManifest(parsed)) throw new Error("plugin.json lacks a name, a version, a license or skills");
   return parsed;
 }
@@ -94,11 +98,11 @@ test("the plugin manifest", () => {
   assert.equal(plugin.name, "unmistakable");
   assert.match(plugin.version, SEMVER);
   assert.equal(plugin.license, "MIT");
-  plugin.skills.forEach((skill) => assert.ok(statSync(join(ROOT, skill, "SKILL.md")).isFile(), `${skill} has no SKILL.md`));
-  const listing: unknown = JSON.parse(text(".claude-plugin", "plugin.json"));
+  plugin.skills.forEach((skill) => assert.ok(statSync(join(PLUGIN, skill, "SKILL.md")).isFile(), `${skill} has no SKILL.md`));
+  const listing: unknown = JSON.parse(plug(".claude-plugin", "plugin.json"));
   LISTING_FIELDS.forEach((field) => assert.ok((listing as Record<string, unknown>)[field], `plugin.json lacks ${field}`)); // read as a plain record: the fields are optional
   const market: { readonly plugins: readonly { readonly name: string; readonly source: string }[] } = JSON.parse(text(".claude-plugin", "marketplace.json"));
-  assert.deepEqual(market.plugins.map((p) => [p.name, p.source]), [[plugin.name, "./"]]);
+  assert.deepEqual(market.plugins.map((p) => [p.name, p.source]), [[plugin.name, "./plugins/unmistakable"]]);
 });
 
 test("the listing links lead to sections that exist", () => {
@@ -115,19 +119,19 @@ test("the footers of the docs show the plugin version", () => {
 });
 
 test("the skill", () => {
-  const skill = text("skills", "asd-ste100", "SKILL.md");
+  const skill = plug("skills", "asd-ste100", "SKILL.md");
   const frontmatter = FRONTMATTER.exec(skill)?.[1] ?? "";
   assert.ok(SKILL_NAME.test(frontmatter), "the skill keeps the name asd-ste100: pr-brief invokes it by that name");
   assert.ok(SKILL_DESCRIPTION.test(frontmatter), "the skill needs a description");
   assert.ok(skill.includes("scripts/ste-lint.ts"), "SKILL.md must tell the reader to run scripts/ste-lint.ts");
-  const mentions = files(join(ROOT, "skills")).filter((f) => text(relative(ROOT, f.path)).includes("ste-lint.py"));
+  const mentions = files(join(PLUGIN, "skills")).filter((f) => text(relative(ROOT, f.path)).includes("ste-lint.py"));
   assert.deepEqual(mentions, [], "the skill must not mention the Python linter, which this plugin does not ship");
 });
 
 // ASD owns the ASD-STE100 mark and does not endorse tools. The marketing copy must not claim otherwise. The skill is left
 // out: it states, as a non-goal, that it does not produce STE-compliant documents.
 test("no claim of compliance, certification or endorsement", () => {
-  const targets = ["README.md", ...readdirSync(join(ROOT, "docs")).filter((n) => n.endsWith(".html")).map((n) => join("docs", n)), join(".claude-plugin", "plugin.json"), join(".claude-plugin", "marketplace.json")];
+  const targets = ["README.md", ...readdirSync(join(ROOT, "docs")).filter((n) => n.endsWith(".html")).map((n) => join("docs", n)), join("plugins", "unmistakable", ".claude-plugin", "plugin.json"), join(".claude-plugin", "marketplace.json")];
   targets.forEach((target) => {
     const body = text(target);
     [...body.matchAll(BANNED_CLAIM)]
@@ -148,8 +152,8 @@ test("what ships stays small, readable and free of native code", () => {
     const native = (NATIVE_HEADS as Readonly<Record<string, string>>)[magic.toString("hex")] ?? (magic.subarray(0, DOS_MAGIC.length).toString("latin1") === DOS_MAGIC ? "Windows executable" : undefined); // the table is `as const`; the cast only widens the key
     assert.equal(native, undefined, `${path} is a ${native}: the scanner cannot read it`);
   });
-  assert.ok(!all.some(({ path }) => path.startsWith("bin/")), "a top-level bin/ directory stops the plugin installing on Cowork and claude.ai");
-  all.filter(({ path }) => path.startsWith("scripts/") && path.endsWith(".ts")).forEach(({ path }) => {
+  assert.ok(!all.some(({ path }) => path.startsWith("bin/") || path.startsWith("plugins/unmistakable/bin/")), "a top-level bin/ directory stops the plugin installing on Cowork and claude.ai");
+  all.filter(({ path }) => path.startsWith("plugins/unmistakable/scripts/") && path.endsWith(".ts")).forEach(({ path }) => {
     const source = text(path);
     assert.ok(!WHOLE_ENV.test(source), `${path} copies the whole environment: read named variables instead`);
     assert.ok(!CREDENTIAL_PLACEHOLDER.test(source), `${path} has a template placeholder that names a credential`);
@@ -159,11 +163,11 @@ test("what ships stays small, readable and free of native code", () => {
 // The host of a regex tester site. Matches "regex7.com" and "regexr.com"; rejects "regular expressions".
 const TESTER_HOST = /regex(?:\d+|r)\.com/;
 const SELF = "test/repo.test.ts";
-// A TypeScript file of the code. Matches "scripts/core.ts"; rejects "scripts/render-assets.sh".
-const CODE_FILE = /^(?:scripts|test|parity)\/.*\.ts$/;
+// A TypeScript file of the code. Matches "plugins/unmistakable/scripts/core.ts"; rejects "scripts/render-assets.sh".
+const CODE_FILE = /^(?:plugins\/unmistakable\/scripts|test|parity)\/.*\.ts$/;
 // A named regex at the top level of a file. Matches "const SEMVER = /^a$/;" → ("SEMVER"); rejects "const x = 1;".
 const REGEX_DECLARATION = /^(?:export )?const (\w+)(?:: RegExp)? = \//gm;
-// A row of REGEXES.md. Matches "| `scripts/core.ts` | `SEMVER` |" → ("scripts/core.ts", "SEMVER"); rejects a heading.
+// A row of REGEXES.md. Matches "| `plugins/unmistakable/scripts/core.ts` | `SEMVER` |" → ("plugins/unmistakable/scripts/core.ts", "SEMVER"); rejects a heading.
 const REGEX_ROW = /^\| `([^`]+)` \| `([^`]+)` \|/gm;
 
 // The scanner holds a plugin for review when a code file has a remote URL beside a word that names a credential.
@@ -189,4 +193,19 @@ test("the README sample is real output", () => {
   assert.ok(sample, "the README has no linter sample");
   const result = cli([], "We spin up the box; it isn't running.\n");
   assert.equal(sample, result.out);
+});
+
+// The marketplace entry points at plugins/unmistakable, so the scan reads that directory and nothing else. It must hold
+// the runtime files only, with the icon as its one binary, and the icon path in plugin.json must lead to that file.
+test("the plugin directory is small, self-contained and its icon is where plugin.json says", () => {
+  const inside = files(PLUGIN);
+  assert.ok(inside.length <= MAX_PLUGIN_FILES, `the plugin directory has ${inside.length} files: keep the dev files outside it`);
+  inside.forEach(({ path, bytes }) => assert.ok(bytes <= MAX_PLUGIN_BYTES, `${path} is over 1 MiB`));
+  const binaries = inside.map(({ path }) => path).filter((path) => !isText(path));
+  const icon = (JSON.parse(plug(".claude-plugin", "plugin.json")) as { readonly icon?: string }).icon ?? ""; // the icon is optional in the schema, so it may be missing
+  assert.ok(icon.startsWith("./"), "the icon path is relative to the plugin directory and starts with ./");
+  assert.deepEqual(binaries, [relative(ROOT, join(PLUGIN, icon))], "the icon is the one binary of the plugin, and plugin.json points at it");
+  assert.equal(head(binaries[0] ?? "").toString("hex"), PNG_MAGIC, "the icon is a PNG");
+  assert.ok(!inside.some(({ path }) => basename(path).startsWith("package")), "no package.json or lockfile: the directory would run npm ci");
+  assert.equal(plug("LICENSE"), text("LICENSE"), "the licence in the plugin directory is the licence of the repository");
 });
