@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { EXTRA_SPEC, lintText, type LintOptions, type Profile, type Report } from "../scripts/stelint.ts";
+import { EXTRA_SPEC, lintText, type LintOptions, type Profile, type Report } from "../plugins/unmistakable/scripts/stelint.ts";
 import { ROOT } from "./helpers.ts";
 
 const upstream = (text: string, options: LintOptions = {}): Report => lintText(text, { profile: "upstream", ...options });

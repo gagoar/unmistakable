@@ -1,8 +1,9 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { run } from "../scripts/cli.ts";
+import { run } from "../plugins/unmistakable/scripts/cli.ts";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+export const PLUGIN = join(ROOT, "plugins", "unmistakable"); // the directory that the marketplace entry points at
 
 export interface CliResult {
   readonly code: number;

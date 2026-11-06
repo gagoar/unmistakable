@@ -19,5 +19,5 @@ shot() {
 }
 shot icon.html 1024 1024 "$here/docs/assets"
 shot og.html 1200 630 "$here/docs/assets"
-shot icon.html 1024 1024 "$here/.claude-plugin"
+shot icon.html 1024 1024 "$here/plugins/unmistakable/.claude-plugin"
 

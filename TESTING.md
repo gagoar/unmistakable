@@ -37,9 +37,9 @@ Run these in a session with the plugin installed. `claude plugin eval` can run t
 2. **No trigger.** Ask for a product tagline. Pass: the skill stays out of it.
 3. **Hedges survive.** Rewrite "An error may have occurred ... which could be caused by an outdated client."
    Pass: "may" and "can" stay. Fail: "The request failed."
-4. **Lint clean.** Rewrite a long tool description. Run `node scripts/ste-lint.ts --profile descriptive` on the result.
+4. **Lint clean.** Rewrite a long tool description. Run `node plugins/unmistakable/scripts/ste-lint.ts --profile descriptive` on the result.
    Pass: 0 hard findings.
 5. **Warning keeps its risk.** Rewrite a `WARNING:` line. Pass: the command comes first and a second sentence
    still states the risk.
-6. **Procedure length.** Rewrite a numbered procedure. Run `node scripts/ste-lint.ts --profile procedure`. Pass: 0 hard findings.
+6. **Procedure length.** Rewrite a numbered procedure. Run `node plugins/unmistakable/scripts/ste-lint.ts --profile procedure`. Pass: 0 hard findings.
 7. **No Node.** Run the skill with `node` off the path. Pass: it rewrites, and it says that the lint did not run.
