@@ -30,7 +30,7 @@ Upstream is MIT licensed, © 2026 Dustin Yuchen Teng. The full text is in `plugi
    is labeled `X-`.
 6. Part 1 of `examples/before-after.md` is titled "Rule Illustrations", not "Official STE Examples": the
    examples are not ASD's.
-7. `scripts/ste-lint.py` is not shipped. The skill runs `node "${CLAUDE_PLUGIN_ROOT}/scripts/ste-lint.ts"`.
+7. `scripts/ste-lint.py` is not shipped. The skill runs `node "<skill-dir>/../../scripts/ste-lint.ts"`. It names no harness variable: Codex sets none in the shell.
 
 **The linter.** It is TypeScript that Node runs as it is, so no binary ships. `--profile upstream` gives upstream's output, byte for byte. The other profiles
 (`agent`, the default, `descriptive`, `procedure`) label each finding with its rule number in a `spec` field and
