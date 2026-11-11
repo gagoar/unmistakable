@@ -1,7 +1,7 @@
 // Tests about the repository itself: the manifests, the skill, the docs, the size of what ships and the wording
 // of the marketing copy. They hold no logic of the linter.
 import assert from "node:assert/strict";
-import { closeSync, openSync, readdirSync, readFileSync, readSync, statSync } from "node:fs";
+import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync, statSync } from "node:fs";
 import { basename, join, relative } from "node:path";
 import { test } from "node:test";
 import { cli, PLUGIN, ROOT } from "./helpers.ts";
@@ -12,10 +12,15 @@ const PNG_MAGIC = "89504e47"; // the first four bytes of a PNG, as hex
 const MAX_PLUGIN_FILES = 20; // the plugin directory holds the runtime files only
 const MAX_TEXT_BYTES = 262_144; // 256 KiB: the scanner reads a script or a document only up to this size
 const MIN_DESCRIPTION = 40;
+const MAX_DESCRIPTION = 1024; // the Agent Skills spec allows a description of 1 to 1024 characters
 const MAGIC_BYTES = 4;
 const DOS_MAGIC = "MZ";
 const NEGATION_WINDOW = 60;
 const TEXT_NAMES: ReadonlySet<string> = new Set(["LICENSE", "LICENSE-UPSTREAM", ".gitignore"]); // text files with no extension
+// The front matter keys of the Agent Skills spec (agentskills.io/specification). A strict reader may reject any other key.
+const SPEC_KEYS: ReadonlySet<string> = new Set(["name", "description", "license", "compatibility", "metadata", "allowed-tools"]);
+// Names that only one harness sets. Codex sets none of them in the shell, so a command that uses one fails there.
+const HARNESS_VARIABLES = ["${CLAUDE_PLUGIN_ROOT}", "${CLAUDE_SKILL_DIR}", "${PLUGIN_ROOT}"] as const;
 const LISTING_FIELDS = ["documentationUrl", "supportUrl", "privacyPolicyUrl", "termsOfServiceUrl"] as const;
 // The first four bytes of a native executable, as hex: ELF, and Mach-O in both byte orders and both word sizes.
 const NATIVE_HEADS = {
@@ -126,6 +131,23 @@ test("the skill", () => {
   assert.ok(skill.includes("scripts/ste-lint.ts"), "SKILL.md must tell the reader to run scripts/ste-lint.ts");
   const mentions = files(join(PLUGIN, "skills")).filter((f) => text(relative(ROOT, f.path)).includes("ste-lint.py"));
   assert.deepEqual(mentions, [], "the skill must not mention the Python linter, which this plugin does not ship");
+});
+
+// Any tool that reads the Agent Skills format loads this skill, so its front matter keeps to the spec, and the
+// command it tells the reader to run must work in a shell that has no harness variable.
+test("the skill follows the Agent Skills spec and runs anywhere", () => {
+  const skill = plug("skills", "asd-ste100", "SKILL.md");
+  const lines = (FRONTMATTER.exec(skill)?.[1] ?? "").split("\n");
+  const keys = lines.filter((line) => !line.startsWith(" ") && line.includes(":")).map((line) => line.slice(0, line.indexOf(":")));
+  const stray = keys.filter((key) => !SPEC_KEYS.has(key));
+  assert.deepEqual(stray, [], `front matter keys outside the spec: ${stray.join(", ")}. Put extra fields under metadata:`);
+  const descriptionLine = lines.find((line) => line.startsWith("description:"));
+  assert.ok(descriptionLine, "the skill needs a description");
+  const raw = descriptionLine.slice("description:".length).trim();
+  const description = raw.startsWith('"') && raw.endsWith('"') ? raw.slice(1, -1) : raw; // the value may be quoted
+  assert.ok(!!description.length && description.length <= MAX_DESCRIPTION, `the description is ${description.length} characters; the spec allows 1 to ${MAX_DESCRIPTION}`);
+  HARNESS_VARIABLES.forEach((name) => assert.ok(!skill.includes(name), `SKILL.md uses ${name}: Codex sets no such variable, so the command fails there. Name the path from the skill folder`));
+  assert.ok(existsSync(join(PLUGIN, "scripts", "ste-lint.ts")), "the skill names ../../scripts/ste-lint.ts: it must exist two folders above the skill");
 });
 
 // ASD owns the ASD-STE100 mark and does not endorse tools. The marketing copy must not claim otherwise. The skill is left
