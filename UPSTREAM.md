@@ -9,6 +9,7 @@ Upstream is MIT licensed, © 2026 Dustin Yuchen Teng. The full text is in `plugi
 | Pinned commit | `32511c6992ecb5f1971e46a2943f2e6adceedafe` (upstream skill version 0.4.0) |
 | Retrieved | 2026-10-12 |
 | Skill version here | 0.5.0 |
+| Downstream notice | [danyuchn/asd-ste100-skill#69](https://github.com/danyuchn/asd-ste100-skill/issues/69), opened 2026-11-13 |
 
 ## What comes from upstream
 

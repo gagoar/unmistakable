@@ -144,6 +144,10 @@ A rule number in this skill (Rule 3.6) names a rule of ASD-STE100 Issue 9. It po
 
 This skill follows the ASD-STE100 rules in spirit. It is not made, checked or endorsed by ASD, and it does not claim that a text complies with the standard.
 
+## Origin
+
+This skill is based on [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill) by Dustin Yuchen Teng (MIT). The text is edited in the unmistakable plugin: see `UPSTREAM.md` in its repository.
+
 ## Additional Resources
 
 - **`references/writing-rules.md`** — fuller summary of the 9 rule sections and dictionary structure, with citations to the official standard and secondary sources.

@@ -4,6 +4,8 @@
 
 **Rewrite English so an AI agent cannot misread it.** A Claude Code plugin with a skill that rewrites text, and a linter that checks the result. It follows the [ASD-STE100](https://www.asd-ste100.org/) rules for Simplified Technical English.
 
+Based on [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill) by Dustin Yuchen Teng (MIT). See [Credit](#credit).
+
 Use it for text that a model, a pipeline or a non-native reader must parse with nobody there to ask what you meant: tool descriptions, error messages, system prompts, inter-agent instructions, status reports and PR descriptions.
 
 | Before | After |
@@ -62,7 +64,7 @@ The linter has no part-of-speech tagger. It finds structure, not meaning. It doe
 
 ## Credit
 
-The skill and the first linter are by Dustin Yuchen Teng: [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill), MIT. This plugin packages them, fixes the statements that the audit against Issue 9 found wrong, ports the linter to TypeScript, and adds profiles and checks. `UPSTREAM.md` lists every change.
+The skill and the first linter are by Dustin Yuchen Teng: [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill), MIT. This plugin packages them, fixes the statements that the audit against Issue 9 found wrong, ports the linter to TypeScript, and adds profiles and checks. The skill text is edited here, so report a problem in this repository first, not upstream. `UPSTREAM.md` lists every change.
 
 ## Not endorsed by ASD
 
